@@ -11,6 +11,7 @@ import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.SolidBorder
+import com.itextpdf.layout.element.ILineDrawer
 import com.itextpdf.layout.element.LineSeparator
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Table
@@ -63,7 +64,7 @@ class PDFGenerator(private val context: Context) {
         
         document.add(orgName)
         document.add(orgAddress)
-        document.add(LineSeparator(SolidBorder(1f) as com.itextpdf.layout.element.ILineDrawer))
+        document.add(LineSeparator(SolidBorder(1f) as ILineDrawer))
     }
     
     private fun addReceiptDetails(document: Document, receipt: Receipt) {
@@ -95,7 +96,7 @@ class PDFGenerator(private val context: Context) {
         
         document.add(customerName)
         document.add(customerPhone)
-        document.add(LineSeparator(SolidBorder(0.5f) as com.itextpdf.layout.element.ILineDrawer))
+        document.add(LineSeparator(SolidBorder(0.5f) as ILineDrawer))
     }
     
     private fun addServiceDetails(document: Document, receipt: Receipt) {
@@ -115,7 +116,7 @@ class PDFGenerator(private val context: Context) {
         )
         
         document.add(serviceTable)
-        document.add(LineSeparator(SolidBorder(0.5f) as com.itextpdf.layout.element.ILineDrawer))
+        document.add(LineSeparator(SolidBorder(0.5f) as ILineDrawer))
         
         val totalTable = Table(2)
         totalTable.setWidth(UnitValue.createPercentValue(100f))
@@ -143,7 +144,7 @@ class PDFGenerator(private val context: Context) {
             .setMarginBottom(10f)
         
         document.add(paymentMode)
-        document.add(LineSeparator(SolidBorder(0.5f) as com.itextpdf.layout.element.ILineDrawer))
+        document.add(LineSeparator(SolidBorder(0.5f) as ILineDrawer))
     }
     
     private fun addFooter(document: Document) {
