@@ -242,7 +242,7 @@ fun ServiceSelectionSection(
                 }
             }
             
-            HorizontalDivider()
+            Divider()
             
             OutlinedTextField(
                 value = customAmount,
@@ -520,7 +520,7 @@ fun ReceiptPreviewDialog(
                             modifier = Modifier.fillMaxWidth()
                         )
                         
-                        HorizontalDivider()
+                        Divider()
                         
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -533,7 +533,7 @@ fun ReceiptPreviewDialog(
                         Text("${receipt.customerName}", style = MaterialTheme.typography.bodyMedium)
                         Text("${receipt.customerPhone}", style = MaterialTheme.typography.bodySmall)
                         
-                        HorizontalDivider()
+                        Divider()
                         
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -543,7 +543,7 @@ fun ReceiptPreviewDialog(
                             Text(receipt.getFormattedAmount(), fontWeight = FontWeight.Bold)
                         }
                         
-                        HorizontalDivider()
+                        Divider()
                         
                         Row(
                             modifier = Modifier.fillMaxWidth(),
