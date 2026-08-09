@@ -10,9 +10,6 @@ import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
-import com.itextpdf.layout.borders.SolidBorder
-import com.itextpdf.layout.element.ILineDrawer
-import com.itextpdf.layout.element.LineSeparator
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Table
 import com.itextpdf.layout.properties.TextAlignment
@@ -64,7 +61,7 @@ class PDFGenerator(private val context: Context) {
         
         document.add(orgName)
         document.add(orgAddress)
-        document.add(LineSeparator(SolidBorder(1f) as ILineDrawer))
+        document.add(Paragraph("―――――――――――――――――――――――――――――――――――").setTextAlignment(TextAlignment.CENTER).setMarginTop(5f).setMarginBottom(10f))
     }
     
     private fun addReceiptDetails(document: Document, receipt: Receipt) {
@@ -96,7 +93,7 @@ class PDFGenerator(private val context: Context) {
         
         document.add(customerName)
         document.add(customerPhone)
-        document.add(LineSeparator(SolidBorder(0.5f) as ILineDrawer))
+        document.add(Paragraph("―――――――――――――――――――――――――――――――――――").setTextAlignment(TextAlignment.CENTER).setMarginTop(5f).setMarginBottom(10f))
     }
     
     private fun addServiceDetails(document: Document, receipt: Receipt) {
@@ -116,7 +113,7 @@ class PDFGenerator(private val context: Context) {
         )
         
         document.add(serviceTable)
-        document.add(LineSeparator(SolidBorder(0.5f) as ILineDrawer))
+        document.add(Paragraph("―――――――――――――――――――――――――――――――――――").setTextAlignment(TextAlignment.CENTER).setMarginTop(5f).setMarginBottom(10f))
         
         val totalTable = Table(2)
         totalTable.setWidth(UnitValue.createPercentValue(100f))
@@ -144,7 +141,7 @@ class PDFGenerator(private val context: Context) {
             .setMarginBottom(10f)
         
         document.add(paymentMode)
-        document.add(LineSeparator(SolidBorder(0.5f) as ILineDrawer))
+        document.add(Paragraph("―――――――――――――――――――――――――――――――――――").setTextAlignment(TextAlignment.CENTER).setMarginTop(5f).setMarginBottom(10f))
     }
     
     private fun addFooter(document: Document) {
