@@ -1,18 +1,11 @@
 package com.rayara.sevasetu.utils
 
 import android.content.Context
-import com.itextpdf.io.font.PdfEncodings
-import com.itextpdf.kernel.font.PdfFont
-import com.itextpdf.kernel.font.PdfFontFactory
-import com.itextpdf.kernel.geom.PageSize
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfWriter
-import com.itextpdf.layout.Document
-import com.itextpdf.layout.element.Cell
-import com.itextpdf.layout.element.Paragraph
-import com.itextpdf.layout.element.Table
-import com.itextpdf.layout.properties.TextAlignment
-import com.itextpdf.layout.properties.UnitValue
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import android.text.TextPaint
 import com.rayara.sevasetu.data.database.entities.Receipt
 import com.rayara.sevasetu.data.models.PaymentMode
 import java.io.File
@@ -33,38 +26,29 @@ data class TransactionSummary(
 
 class PDFExporter(private val context: Context) {
     
-    private fun getKannadaFont(): PdfFont? {
-        return try {
-            // First try to load from bundled assets (guaranteed to work)
-            val assetManager = context.assets
-            val fontStream = assetManager.open("fonts/NotoSansKannada-Regular.ttf")
-            val fontBytes = fontStream.readBytes()
-            fontStream.close()
-            
-            PdfFontFactory.createFont(
-                fontBytes, 
-                PdfEncodings.IDENTITY_H, 
-                PdfFontFactory.EmbeddingStrategy.FORCE_EMBEDDED
-            )
-        } catch (e: Exception) {
-            try {
-                // Fallback to system font if assets fail
-                PdfFontFactory.createFont(
-                    "/system/fonts/NotoSansKannada-Regular.ttf", 
-                    PdfEncodings.IDENTITY_H, 
-                    PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
-                )
-            } catch (e2: Exception) {
-                try {
-                    // Last fallback
-                    PdfFontFactory.createFont(
-                        "/system/fonts/DroidSansFallback.ttf", 
-                        PdfEncodings.IDENTITY_H, 
-                        PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
-                    )
-                } catch (e3: Exception) {
-                    null
-                }
+    // Page dimensions (A4 size in points: 595 x 842)
+    private val PAGE_WIDTH = 595f
+    private val PAGE_HEIGHT = 842f
+    private val MARGIN = 30f
+    private val CONTENT_WIDTH = PAGE_WIDTH - (2 * MARGIN)
+    
+    // Text sizes
+    private val TITLE_SIZE = 16f
+    private val SUBTITLE_SIZE = 12f
+    private val NORMAL_SIZE = 10f
+    private val SMALL_SIZE = 9f
+    private val TABLE_HEADER_SIZE = 9f
+    private val TABLE_CELL_SIZE = 8f
+    
+    private fun createTextPaint(size: Float, bold: Boolean = false): TextPaint {
+        return TextPaint().apply {
+            isAntiAlias = true
+            textSize = size
+            color = android.graphics.Color.BLACK
+            typeface = if (bold) {
+                Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            } else {
+                Typeface.DEFAULT
             }
         }
     }
@@ -83,137 +67,199 @@ class PDFExporter(private val context: Context) {
         val timestamp = dateFormat.format(Date())
         val pdfFile = File(pdfDir, "transactions_${timestamp}.pdf")
         
-        val writer = PdfWriter(FileOutputStream(pdfFile))
-        val pdfDocument = PdfDocument(writer)
-        val document = Document(pdfDocument, PageSize.A4)
+        // Create PDF document
+        val pdfDocument = PdfDocument()
+        val pageInfo = PdfDocument.PageInfo.Builder(
+            PAGE_WIDTH.toInt(),
+            PAGE_HEIGHT.toInt(),
+            1
+        ).create()
         
-        document.setMargins(30f, 30f, 30f, 30f)
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
         
-        val font = getKannadaFont()
+        var yPosition = MARGIN
         
-        addExportHeader(document, font, startDate, endDate)
-        addSummary(document, font, receipts)
-        addTransactionTable(document, font, receipts)
+        // Draw header
+        yPosition = drawExportHeader(canvas, startDate, endDate, yPosition)
+        yPosition += 20f
         
-        document.close()
+        // Draw summary
+        yPosition = drawSummary(canvas, receipts, yPosition)
+        yPosition += 20f
+        
+        // Draw transaction table
+        drawTransactionTable(canvas, receipts, yPosition)
+        
+        pdfDocument.finishPage(page)
+        
+        // Write to file
+        pdfDocument.writeTo(FileOutputStream(pdfFile))
+        pdfDocument.close()
         
         return pdfFile
     }
     
-    private fun addExportHeader(document: Document, font: PdfFont?, startDate: String, endDate: String) {
-        val orgName = Paragraph(Constants.Organization.NAME)
-            .setTextAlignment(TextAlignment.CENTER)
-            .setFontSize(16f)
-            .setBold()
-            .setMarginBottom(5f)
-        font?.let { orgName.setFont(it) }
+    private fun drawExportHeader(canvas: Canvas, startDate: String, endDate: String, startY: Float): Float {
+        var y = startY
         
-        val orgAddress = Paragraph(Constants.Organization.ADDRESS)
-            .setTextAlignment(TextAlignment.CENTER)
-            .setFontSize(12f)
-            .setMarginBottom(10f)
-        font?.let { orgAddress.setFont(it) }
+        // Organization name (centered, bold)
+        val titlePaint = createTextPaint(TITLE_SIZE, bold = true)
+        val orgName = Constants.Organization.NAME
+        val orgNameWidth = titlePaint.measureText(orgName)
+        canvas.drawText(orgName, (PAGE_WIDTH - orgNameWidth) / 2, y, titlePaint)
+        y += TITLE_SIZE + 5f
         
-        val title = Paragraph("ವಹಿವಾಟು ವರದಿ")
-            .setTextAlignment(TextAlignment.CENTER)
-            .setFontSize(14f)
-            .setBold()
-            .setMarginBottom(5f)
-        font?.let { title.setFont(it) }
+        // Organization address (centered)
+        val subtitlePaint = createTextPaint(SUBTITLE_SIZE)
+        val orgAddress = Constants.Organization.ADDRESS
+        val orgAddressWidth = subtitlePaint.measureText(orgAddress)
+        canvas.drawText(orgAddress, (PAGE_WIDTH - orgAddressWidth) / 2, y, subtitlePaint)
+        y += SUBTITLE_SIZE + 10f
         
-        val dateRange = Paragraph("$startDate ರಿಂದ $endDate ವರೆಗೆ")
-            .setTextAlignment(TextAlignment.CENTER)
-            .setFontSize(11f)
-            .setMarginBottom(15f)
-        font?.let { dateRange.setFont(it) }
+        // Divider line
+        val linePaint = Paint().apply {
+            color = android.graphics.Color.BLACK
+            strokeWidth = 1f
+        }
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
+        y += 10f
         
-        document.add(orgName)
-        document.add(orgAddress)
-        document.add(Paragraph("―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――").setTextAlignment(TextAlignment.CENTER).setMarginBottom(10f))
-        document.add(title)
-        document.add(dateRange)
+        // Report title (centered, bold)
+        val reportTitlePaint = createTextPaint(14f, bold = true)
+        val reportTitle = "ವಹಿವಾಟು ವರದಿ"
+        val reportTitleWidth = reportTitlePaint.measureText(reportTitle)
+        canvas.drawText(reportTitle, (PAGE_WIDTH - reportTitleWidth) / 2, y, reportTitlePaint)
+        y += 14f + 5f
+        
+        // Date range (centered)
+        val dateRangePaint = createTextPaint(NORMAL_SIZE)
+        val dateRangeText = "$startDate ರಿಂದ $endDate ವರೆಗೆ"
+        val dateRangeWidth = dateRangePaint.measureText(dateRangeText)
+        canvas.drawText(dateRangeText, (PAGE_WIDTH - dateRangeWidth) / 2, y, dateRangePaint)
+        y += NORMAL_SIZE + 15f
+        
+        return y
     }
     
-    private fun addSummary(document: Document, font: PdfFont?, receipts: List<Receipt>) {
+    private fun drawSummary(canvas: Canvas, receipts: List<Receipt>, startY: Float): Float {
+        var y = startY
         val summary = calculateSummary(receipts)
         
-        val summaryTitle = Paragraph("ಸಾರಾಂಶ")
-            .setFontSize(13f)
-            .setBold()
-            .setMarginBottom(10f)
-        font?.let { summaryTitle.setFont(it) }
-        document.add(summaryTitle)
+        // Summary title (bold)
+        val titlePaint = createTextPaint(SUBTITLE_SIZE, bold = true)
+        canvas.drawText("ಸಾರಾಂಶ", MARGIN, y, titlePaint)
+        y += SUBTITLE_SIZE + 10f
         
-        val summaryTable = Table(UnitValue.createPercentArray(floatArrayOf(50f, 50f)))
-        summaryTable.setWidth(UnitValue.createPercentValue(100f))
-        summaryTable.setMarginBottom(15f)
+        // Summary rows
+        val labelPaint = createTextPaint(NORMAL_SIZE, bold = true)
+        val valuePaint = createTextPaint(NORMAL_SIZE)
+        val rowHeight = NORMAL_SIZE + 5f
         
-        addSummaryRow(summaryTable, font, "ಒಟ್ಟು ವಹಿವಾಟುಗಳು:", "${summary.totalTransactions}")
-        addSummaryRow(summaryTable, font, "ಒಟ್ಟು ಮೊತ್ತ:", "₹${String.format("%.2f", summary.totalAmount)}")
-        addSummaryRow(summaryTable, font, "ನಗದು (${summary.cashCount}):", "₹${String.format("%.2f", summary.cashAmount)}")
-        addSummaryRow(summaryTable, font, "PhonePe (${summary.phonePeCount}):", "₹${String.format("%.2f", summary.phonePeAmount)}")
-        addSummaryRow(summaryTable, font, "ಆನ್‌ಲೈನ್ (${summary.onlineCount}):", "₹${String.format("%.2f", summary.onlineAmount)}")
+        // Total transactions
+        canvas.drawText("ಒಟ್ಟು ವಹಿವಾಟುಗಳು:", MARGIN, y, labelPaint)
+        val value1 = "${summary.totalTransactions}"
+        val value1Width = valuePaint.measureText(value1)
+        canvas.drawText(value1, PAGE_WIDTH - MARGIN - value1Width, y, valuePaint)
+        y += rowHeight
         
-        document.add(summaryTable)
-        document.add(Paragraph("―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――").setTextAlignment(TextAlignment.CENTER).setMarginTop(5f).setMarginBottom(15f))
-    }
-    
-    private fun addSummaryRow(table: Table, font: PdfFont?, label: String, value: String) {
-        val labelPara = Paragraph(label).setFontSize(10f).setBold()
-        font?.let { labelPara.setFont(it) }
-        val labelCell = Cell().add(labelPara)
+        // Total amount
+        canvas.drawText("ಒಟ್ಟು ಮೊತ್ತ:", MARGIN, y, labelPaint)
+        val value2 = "₹${String.format("%.2f", summary.totalAmount)}"
+        val value2Width = valuePaint.measureText(value2)
+        canvas.drawText(value2, PAGE_WIDTH - MARGIN - value2Width, y, valuePaint)
+        y += rowHeight
         
-        val valuePara = Paragraph(value).setFontSize(10f).setTextAlignment(TextAlignment.RIGHT)
-        font?.let { valuePara.setFont(it) }
-        val valueCell = Cell().add(valuePara)
+        // Cash
+        canvas.drawText("ನಗದು (${summary.cashCount}):", MARGIN, y, labelPaint)
+        val value3 = "₹${String.format("%.2f", summary.cashAmount)}"
+        val value3Width = valuePaint.measureText(value3)
+        canvas.drawText(value3, PAGE_WIDTH - MARGIN - value3Width, y, valuePaint)
+        y += rowHeight
         
-        table.addCell(labelCell)
-        table.addCell(valueCell)
-    }
-    
-    private fun addTransactionTable(document: Document, font: PdfFont?, receipts: List<Receipt>) {
-        val tableTitle = Paragraph("ವಿವರವಾದ ವಹಿವಾಟುಗಳು")
-            .setFontSize(13f)
-            .setBold()
-            .setMarginBottom(10f)
-        font?.let { tableTitle.setFont(it) }
-        document.add(tableTitle)
+        // PhonePe
+        canvas.drawText("PhonePe (${summary.phonePeCount}):", MARGIN, y, labelPaint)
+        val value4 = "₹${String.format("%.2f", summary.phonePeAmount)}"
+        val value4Width = valuePaint.measureText(value4)
+        canvas.drawText(value4, PAGE_WIDTH - MARGIN - value4Width, y, valuePaint)
+        y += rowHeight
         
-        val table = Table(UnitValue.createPercentArray(floatArrayOf(10f, 15f, 25f, 20f, 15f, 15f)))
-        table.setWidth(UnitValue.createPercentValue(100f))
+        // Online
+        canvas.drawText("ಆನ್‌ಲೈನ್ (${summary.onlineCount}):", MARGIN, y, labelPaint)
+        val value5 = "₹${String.format("%.2f", summary.onlineAmount)}"
+        val value5Width = valuePaint.measureText(value5)
+        canvas.drawText(value5, PAGE_WIDTH - MARGIN - value5Width, y, valuePaint)
+        y += rowHeight + 10f
         
-        addTableHeader(table, font, "ಸಂ.")
-        addTableHeader(table, font, "ದಿನಾಂಕ")
-        addTableHeader(table, font, "ಗ್ರಾಹಕ")
-        addTableHeader(table, font, "ದೂರವಾಣಿ")
-        addTableHeader(table, font, "ಮೊತ್ತ")
-        addTableHeader(table, font, "ಪಾವತಿ")
-        
-        receipts.forEach { receipt ->
-            addTableCell(table, font, receipt.receiptNumber.toString())
-            addTableCell(table, font, receipt.date)
-            addTableCell(table, font, receipt.customerName)
-            addTableCell(table, font, receipt.customerPhone)
-            addTableCell(table, font, receipt.getFormattedAmount(), TextAlignment.RIGHT)
-            addTableCell(table, font, receipt.getPaymentModeEnum().kannadaName)
+        // Divider line
+        val linePaint = Paint().apply {
+            color = android.graphics.Color.BLACK
+            strokeWidth = 1f
         }
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
+        y += 15f
         
-        document.add(table)
+        return y
     }
     
-    private fun addTableHeader(table: Table, font: PdfFont?, text: String) {
-        val para = Paragraph(text).setFontSize(9f).setBold()
-        font?.let { para.setFont(it) }
-        val cell = Cell().add(para)
-        cell.setBackgroundColor(com.itextpdf.kernel.colors.ColorConstants.LIGHT_GRAY)
-        table.addHeaderCell(cell)
-    }
-    
-    private fun addTableCell(table: Table, font: PdfFont?, text: String, alignment: TextAlignment = TextAlignment.LEFT) {
-        val para = Paragraph(text).setFontSize(8f).setTextAlignment(alignment)
-        font?.let { para.setFont(it) }
-        val cell = Cell().add(para)
-        table.addCell(cell)
+    private fun drawTransactionTable(canvas: Canvas, receipts: List<Receipt>, startY: Float) {
+        var y = startY
+        
+        // Table title
+        val titlePaint = createTextPaint(SUBTITLE_SIZE, bold = true)
+        canvas.drawText("ವಿವರವಾದ ವಹಿವಾಟುಗಳು", MARGIN, y, titlePaint)
+        y += SUBTITLE_SIZE + 10f
+        
+        // Column widths (percentages of content width)
+        val col1Width = CONTENT_WIDTH * 0.10f  // ಸಂ.
+        val col2Width = CONTENT_WIDTH * 0.15f  // ದಿನಾಂಕ
+        val col3Width = CONTENT_WIDTH * 0.25f  // ಗ್ರಾಹಕ
+        val col4Width = CONTENT_WIDTH * 0.20f  // ದೂರವಾಣಿ
+        val col5Width = CONTENT_WIDTH * 0.15f  // ಮೊತ್ತ
+        val col6Width = CONTENT_WIDTH * 0.15f  // ಪಾವತಿ
+        
+        // Column X positions
+        val col1X = MARGIN
+        val col2X = col1X + col1Width
+        val col3X = col2X + col2Width
+        val col4X = col3X + col3Width
+        val col5X = col4X + col4Width
+        val col6X = col5X + col5Width
+        
+        // Header row (with gray background)
+        val headerPaint = createTextPaint(TABLE_HEADER_SIZE, bold = true)
+        val grayPaint = Paint().apply {
+            color = android.graphics.Color.LTGRAY
+        }
+        canvas.drawRect(MARGIN, y - TABLE_HEADER_SIZE, PAGE_WIDTH - MARGIN, y + 5f, grayPaint)
+        
+        canvas.drawText("ಸಂ.", col1X + 2f, y, headerPaint)
+        canvas.drawText("ದಿನಾಂಕ", col2X + 2f, y, headerPaint)
+        canvas.drawText("ಗ್ರಾಹಕ", col3X + 2f, y, headerPaint)
+        canvas.drawText("ದೂರವಾಣಿ", col4X + 2f, y, headerPaint)
+        canvas.drawText("ಮೊತ್ತ", col5X + 2f, y, headerPaint)
+        canvas.drawText("ಪಾವತಿ", col6X + 2f, y, headerPaint)
+        y += 5f
+        
+        // Table border
+        val borderPaint = Paint().apply {
+            color = android.graphics.Color.BLACK
+            strokeWidth = 1f
+        }
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, borderPaint)
+        y += 5f
+        
+        // Data rows
+        val cellPaint = createTextPaint(TABLE_CELL_SIZE)
+        receipts.forEach { receipt ->
+            canvas.drawText(receipt.receiptNumber.toString(), col1X + 2f, y, cellPaint)
+            canvas.drawText(receipt.date, col2X + 2f, y, cellPaint)
+            canvas.drawText(receipt.customerName, col3X + 2f, y, cellPaint)
+            canvas.drawText(receipt.customerPhone, col4X + 2f, y, cellPaint)
+            canvas.drawText(receipt.getFormattedAmount(), col5X + 2f, y, cellPaint)
+            canvas.drawText(receipt.getPaymentModeEnum().kannadaName, col6X + 2f, y, cellPaint)
+            y += TABLE_CELL_SIZE + 5f
+        }
     }
     
     private fun calculateSummary(receipts: List<Receipt>): TransactionSummary {

@@ -82,9 +82,6 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
-    // PDF Generation
-    implementation("com.itextpdf:itext7-core:7.2.5")
-    
     // Bluetooth Thermal Printer
     implementation("com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.3.0")
     
