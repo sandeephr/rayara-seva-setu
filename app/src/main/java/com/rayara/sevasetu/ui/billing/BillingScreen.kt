@@ -355,7 +355,7 @@ fun PaymentModeButton(
             Icon(
                 imageVector = when (mode) {
                     PaymentMode.CASH -> Icons.Default.Money
-                    PaymentMode.PHONEPE -> Icons.Default.PhoneAndroid
+                    PaymentMode.UPI -> Icons.Default.PhoneAndroid
                     PaymentMode.ONLINE -> Icons.Default.CreditCard
                 },
                 contentDescription = null,
