@@ -17,10 +17,10 @@ data class TransactionSummary(
     val totalTransactions: Int,
     val totalAmount: Double,
     val cashAmount: Double,
-    val phonePeAmount: Double,
+    val upiAmount: Double,
     val onlineAmount: Double,
     val cashCount: Int,
-    val phonePeCount: Int,
+    val upiCount: Int,
     val onlineCount: Int
 )
 
@@ -177,9 +177,9 @@ class PDFExporter(private val context: Context) {
         canvas.drawText(value3, PAGE_WIDTH - MARGIN - value3Width, y, valuePaint)
         y += rowHeight
         
-        // PhonePe
-        canvas.drawText("PhonePe (${summary.phonePeCount}):", MARGIN, y, labelPaint)
-        val value4 = "₹${String.format("%.2f", summary.phonePeAmount)}"
+        // UPI
+        canvas.drawText("UPI (${summary.upiCount}):", MARGIN, y, labelPaint)
+        val value4 = "₹${String.format("%.2f", summary.upiAmount)}"
         val value4Width = valuePaint.measureText(value4)
         canvas.drawText(value4, PAGE_WIDTH - MARGIN - value4Width, y, valuePaint)
         y += rowHeight
@@ -265,10 +265,10 @@ class PDFExporter(private val context: Context) {
     private fun calculateSummary(receipts: List<Receipt>): TransactionSummary {
         var totalAmount = 0.0
         var cashAmount = 0.0
-        var phonePeAmount = 0.0
+        var upiAmount = 0.0
         var onlineAmount = 0.0
         var cashCount = 0
-        var phonePeCount = 0
+        var upiCount = 0
         var onlineCount = 0
         
         receipts.forEach { receipt ->
@@ -278,9 +278,9 @@ class PDFExporter(private val context: Context) {
                     cashAmount += receipt.amount
                     cashCount++
                 }
-                PaymentMode.PHONEPE -> {
-                    phonePeAmount += receipt.amount
-                    phonePeCount++
+                PaymentMode.UPI -> {
+                    upiAmount += receipt.amount
+                    upiCount++
                 }
                 PaymentMode.ONLINE -> {
                     onlineAmount += receipt.amount
@@ -293,10 +293,10 @@ class PDFExporter(private val context: Context) {
             totalTransactions = receipts.size,
             totalAmount = totalAmount,
             cashAmount = cashAmount,
-            phonePeAmount = phonePeAmount,
+            upiAmount = upiAmount,
             onlineAmount = onlineAmount,
             cashCount = cashCount,
-            phonePeCount = phonePeCount,
+            upiCount = upiCount,
             onlineCount = onlineCount
         )
     }

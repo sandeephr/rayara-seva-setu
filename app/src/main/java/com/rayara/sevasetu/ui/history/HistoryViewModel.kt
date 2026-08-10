@@ -3,6 +3,8 @@ package com.rayara.sevasetu.ui.history
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.util.Log
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -72,22 +74,49 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
     fun exportTransactions(context: Context, startDate: String, endDate: String) {
         viewModelScope.launch {
             try {
+                Log.d("HistoryViewModel", "Starting export: $startDate to $endDate")
+                
                 val receipts = repository.getReceiptsByDateRange(startDate, endDate)
+                Log.d("HistoryViewModel", "Found ${receipts.size} receipts")
+                
+                if (receipts.isEmpty()) {
+                    Toast.makeText(
+                        context,
+                        "ಈ ಅವಧಿಯಲ್ಲಿ ಯಾವುದೇ ವಹಿವಾಟುಗಳಿಲ್ಲ",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@launch
+                }
+                
                 val pdfExporter = PDFExporter(context)
                 val pdfFile = pdfExporter.exportTransactions(receipts, startDate, endDate)
+                Log.d("HistoryViewModel", "PDF created: ${pdfFile.absolutePath}")
                 
                 val uri = FileProvider.getUriForFile(
                     context,
                     "${context.packageName}.fileprovider",
                     pdfFile
                 )
+                
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(uri, "application/pdf")
                     flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 }
+                
+                Toast.makeText(
+                    context,
+                    "${receipts.size} ವಹಿವಾಟುಗಳನ್ನು ರಫ್ತು ಮಾಡಲಾಗಿದೆ",
+                    Toast.LENGTH_SHORT
+                ).show()
+                
                 context.startActivity(Intent.createChooser(intent, "ವಹಿವಾಟು ವರದಿ ತೆರೆಯಿರಿ"))
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("HistoryViewModel", "Export failed", e)
+                Toast.makeText(
+                    context,
+                    "ರಫ್ತು ಮಾಡುವಲ್ಲಿ ತಪ್ಪಾಯಿತು: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }

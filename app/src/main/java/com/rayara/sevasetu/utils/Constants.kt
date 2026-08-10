@@ -4,7 +4,7 @@ object Constants {
     
     object Organization {
         const val NAME = "ಶ್ರೀ ರಾಘವೇಂದ್ರಸ್ವಾಮಿಗಳ ಬ್ರಂದಾವನ"
-        const val ADDRESS = "ಭ್ರಾಹ್ಮಣರ ಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ"
+        const val ADDRESS = "ಬ್ರಾಹ್ಮಣರ ಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ"
         const val TRUST = "ಶ್ರೀ ರಾಘವೇಂದ್ರ ಗುರುಸಾರ್ವಭೌಮ ಸೇವಾ ಟ್ರಸ್ಟ್ (ರಿ.)"
     }
     

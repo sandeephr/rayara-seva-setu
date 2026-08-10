@@ -72,7 +72,13 @@ interface ReceiptDao {
     @Query("""
         SELECT * FROM receipts 
         WHERE isDeleted = 0 
-        AND date BETWEEN :startDate AND :endDate
+        AND (
+            substr(date, 7, 4) || substr(date, 4, 2) || substr(date, 1, 2) 
+            BETWEEN 
+            substr(:startDate, 7, 4) || substr(:startDate, 4, 2) || substr(:startDate, 1, 2)
+            AND 
+            substr(:endDate, 7, 4) || substr(:endDate, 4, 2) || substr(:endDate, 1, 2)
+        )
         ORDER BY timestamp DESC
     """)
     suspend fun getReceiptsByDateRange(startDate: String, endDate: String): List<Receipt>
