@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.rayara.sevasetu.ui.billing.BillingScreen
 import com.rayara.sevasetu.ui.history.HistoryScreen
+import com.rayara.sevasetu.ui.settings.SettingsScreen
 import com.rayara.sevasetu.ui.theme.RayaraSevaSetuTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,12 +44,23 @@ fun RayaraSevaSetuApp() {
             BillingScreen(
                 onNavigateToHistory = {
                     navController.navigate("history")
+                },
+                onNavigateToSettings = {
+                    navController.navigate("settings")
                 }
             )
         }
         
         composable("history") {
             HistoryScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable("settings") {
+            SettingsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }

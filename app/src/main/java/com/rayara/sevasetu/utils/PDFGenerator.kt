@@ -24,6 +24,16 @@ class PDFGenerator(private val context: Context) {
     private val NORMAL_SIZE = 10f
     private val LARGE_SIZE = 12f
     
+    // Color mode
+    private val prefsManager = PreferencesManager(context)
+    private val isColorMode: Boolean
+        get() = prefsManager.isColorReceiptEnabled()
+    
+    // Colors
+    private fun getColor(colorValue: Int, bwValue: Int = android.graphics.Color.BLACK): Int {
+        return if (isColorMode) colorValue else bwValue
+    }
+    
     private fun createTextPaint(size: Float, bold: Boolean = false): TextPaint {
         return TextPaint().apply {
             isAntiAlias = true
@@ -88,73 +98,102 @@ class PDFGenerator(private val context: Context) {
     private fun drawHeader(canvas: Canvas, startY: Float): Float {
         var y = startY
         
-        // Draw gradient background (saffron to light orange)
+        // Draw background (gradient for color, light gray for B&W)
         val headerHeight = 80f
-        val backgroundPaint = Paint().apply {
-            shader = android.graphics.LinearGradient(
-                0f, y, 0f, y + headerHeight,
-                intArrayOf(
-                    android.graphics.Color.rgb(255, 153, 51),  // Saffron
-                    android.graphics.Color.rgb(255, 204, 153)  // Light orange
-                ),
-                null,
-                android.graphics.Shader.TileMode.CLAMP
-            )
+        if (isColorMode) {
+            val backgroundPaint = Paint().apply {
+                shader = android.graphics.LinearGradient(
+                    0f, y, 0f, y + headerHeight,
+                    intArrayOf(
+                        android.graphics.Color.rgb(255, 153, 51),  // Saffron
+                        android.graphics.Color.rgb(255, 204, 153)  // Light orange
+                    ),
+                    null,
+                    android.graphics.Shader.TileMode.CLAMP
+                )
+            }
+            canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + headerHeight, backgroundPaint)
+        } else {
+            // B&W mode: light gray background
+            val backgroundPaint = Paint().apply {
+                color = android.graphics.Color.rgb(240, 240, 240)  // Light gray
+            }
+            canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + headerHeight, backgroundPaint)
         }
-        canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + headerHeight, backgroundPaint)
         
-        // Draw decorative border (darker orange)
+        // Draw decorative border
         val borderPaint = Paint().apply {
-            color = android.graphics.Color.rgb(204, 102, 0)  // Dark orange
-            strokeWidth = 3f
+            color = getColor(
+                android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color mode)
+                android.graphics.Color.BLACK  // Black (B&W mode)
+            )
+            strokeWidth = if (isColorMode) 3f else 2f
             style = Paint.Style.STROKE
         }
         canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + headerHeight, borderPaint)
         y += 10f
         
-        // Om symbol (centered, dark red)
+        // Om symbol (centered)
         val omPaint = createTextPaint(16f, bold = true)
-        omPaint.color = android.graphics.Color.rgb(139, 0, 0)  // Dark red
+        omPaint.color = getColor(
+            android.graphics.Color.rgb(139, 0, 0),  // Dark red (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val om = "ॐ"
         val omWidth = omPaint.measureText(om)
         canvas.drawText(om, (PAGE_WIDTH - omWidth) / 2, y, omPaint)
         y += 16f + 3f
         
-        // Guru mantra (centered, dark brown)
+        // Guru mantra (centered)
         val mantraPaint = createTextPaint(10f)
-        mantraPaint.color = android.graphics.Color.rgb(101, 67, 33)  // Dark brown
-        val mantra = "ಶ್ರೀ ಗುರುಭ್ಯೋ ನಮಃ"
+        mantraPaint.color = getColor(
+            android.graphics.Color.rgb(101, 67, 33),  // Dark brown (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
+        val mantra = "ಶ್ರೀ ಗುರುಭ್ಯೋ ನಮః"
         val mantraWidth = mantraPaint.measureText(mantra)
         canvas.drawText(mantra, (PAGE_WIDTH - mantraWidth) / 2, y, mantraPaint)
         y += 10f + 5f
         
-        // Organization name with temple emoji (centered, bold, dark red)
+        // Organization name with temple emoji (centered, bold)
         val titlePaint = createTextPaint(TITLE_SIZE, bold = true)
-        titlePaint.color = android.graphics.Color.rgb(139, 0, 0)  // Dark red
+        titlePaint.color = getColor(
+            android.graphics.Color.rgb(139, 0, 0),  // Dark red (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val orgName = "🛕 ${Constants.Organization.NAME} 🛕"
         val orgNameWidth = titlePaint.measureText(orgName)
         canvas.drawText(orgName, (PAGE_WIDTH - orgNameWidth) / 2, y, titlePaint)
         y += TITLE_SIZE + 3f
         
-        // Organization address (centered, dark brown)
+        // Organization address (centered)
         val subtitlePaint = createTextPaint(SUBTITLE_SIZE)
-        subtitlePaint.color = android.graphics.Color.rgb(101, 67, 33)  // Dark brown
+        subtitlePaint.color = getColor(
+            android.graphics.Color.rgb(101, 67, 33),  // Dark brown (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val orgAddress = Constants.Organization.ADDRESS
         val orgAddressWidth = subtitlePaint.measureText(orgAddress)
         canvas.drawText(orgAddress, (PAGE_WIDTH - orgAddressWidth) / 2, y, subtitlePaint)
         y += SUBTITLE_SIZE + 5f
         
-        // Raghavendra mantra (centered, small, dark brown)
+        // Raghavendra mantra (centered, small)
         val smallMantraPaint = createTextPaint(8f)
-        smallMantraPaint.color = android.graphics.Color.rgb(101, 67, 33)  // Dark brown
+        smallMantraPaint.color = getColor(
+            android.graphics.Color.rgb(101, 67, 33),  // Dark brown (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val raghavendra = "\"ಪೂಜ್ಯಾಯ ರಾಘವೇಂದ್ರಾಯ ಸತ್ಯಧರ್ಮ ರತಾಯ ಚ\""
         val raghavendraWidth = smallMantraPaint.measureText(raghavendra)
         canvas.drawText(raghavendra, (PAGE_WIDTH - raghavendraWidth) / 2, y, smallMantraPaint)
         y += 8f + 10f
         
-        // Decorative line (dark orange)
+        // Decorative line
         val linePaint = Paint().apply {
-            color = android.graphics.Color.rgb(204, 102, 0)  // Dark orange
+            color = getColor(
+                android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color)
+                android.graphics.Color.BLACK  // Black (B&W)
+            )
             strokeWidth = 2f
         }
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
@@ -166,9 +205,12 @@ class PDFGenerator(private val context: Context) {
     private fun drawReceiptDetails(canvas: Canvas, receipt: Receipt, startY: Float): Float {
         var y = startY
         
-        // Receipt title (centered, orange)
+        // Receipt title (centered)
         val titlePaint = createTextPaint(11f, bold = true)
-        titlePaint.color = android.graphics.Color.rgb(204, 102, 0)  // Dark orange
+        titlePaint.color = getColor(
+            android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val receiptTitle = "ರಸೀದಿ"
         val receiptTitleWidth = titlePaint.measureText(receiptTitle)
         canvas.drawText(receiptTitle, (PAGE_WIDTH - receiptTitleWidth) / 2, y, titlePaint)
@@ -196,9 +238,12 @@ class PDFGenerator(private val context: Context) {
         canvas.drawText(phoneText, MARGIN, y, regularPaint)
         y += NORMAL_SIZE + 10f
         
-        // Decorative double line (orange)
+        // Decorative double line
         val linePaint = Paint().apply {
-            color = android.graphics.Color.rgb(255, 153, 51)  // Saffron
+            color = getColor(
+                android.graphics.Color.rgb(255, 153, 51),  // Saffron (color)
+                android.graphics.Color.BLACK  // Black (B&W)
+            )
             strokeWidth = 1.5f
         }
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
@@ -206,9 +251,12 @@ class PDFGenerator(private val context: Context) {
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
         y += 10f
         
-        // Service details title (centered, orange)
+        // Service details title (centered)
         val serviceTitlePaint = createTextPaint(10f, bold = true)
-        serviceTitlePaint.color = android.graphics.Color.rgb(204, 102, 0)  // Dark orange
+        serviceTitlePaint.color = getColor(
+            android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val serviceTitle = "ಸೇವೆಯ ವಿವರ"
         val serviceTitleWidth = serviceTitlePaint.measureText(serviceTitle)
         canvas.drawText(serviceTitle, (PAGE_WIDTH - serviceTitleWidth) / 2, y, serviceTitlePaint)
@@ -234,9 +282,12 @@ class PDFGenerator(private val context: Context) {
         canvas.drawText(amountText, PAGE_WIDTH - MARGIN - amountWidth, y, normalPaint)
         y += NORMAL_SIZE + 10f
         
-        // Decorative double line (orange)
+        // Decorative double line
         val linePaint = Paint().apply {
-            color = android.graphics.Color.rgb(255, 153, 51)  // Saffron
+            color = getColor(
+                android.graphics.Color.rgb(255, 153, 51),  // Saffron (color)
+                android.graphics.Color.BLACK  // Black (B&W)
+            )
             strokeWidth = 1.5f
         }
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
@@ -244,15 +295,18 @@ class PDFGenerator(private val context: Context) {
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
         y += 10f
         
-        // Total (bold, larger, dark red)
+        // Total (bold, larger)
         val boldPaint = createTextPaint(LARGE_SIZE, bold = true)
-        boldPaint.color = android.graphics.Color.rgb(139, 0, 0)  // Dark red
+        boldPaint.color = getColor(
+            android.graphics.Color.rgb(139, 0, 0),  // Dark red (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         canvas.drawText(Constants.Receipt.TOTAL_LABEL, MARGIN, y, boldPaint)
         val totalAmountWidth = boldPaint.measureText(amountText)
         canvas.drawText(amountText, PAGE_WIDTH - MARGIN - totalAmountWidth, y, boldPaint)
         y += LARGE_SIZE + 8f
         
-        // Decorative double line (orange)
+        // Decorative double line
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
         y += 3f
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
@@ -269,17 +323,23 @@ class PDFGenerator(private val context: Context) {
     private fun drawFooter(canvas: Canvas, startY: Float) {
         var y = startY + 15f
         
-        // Decorative line (orange)
+        // Decorative line
         val linePaint = Paint().apply {
-            color = android.graphics.Color.rgb(255, 153, 51)  // Saffron
+            color = getColor(
+                android.graphics.Color.rgb(255, 153, 51),  // Saffron (color)
+                android.graphics.Color.BLACK  // Black (B&W)
+            )
             strokeWidth = 2f
         }
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
         y += 10f
         
-        // Blessing with flowers (centered, dark brown)
+        // Blessing with flowers (centered)
         val blessingPaint = createTextPaint(9f)
-        blessingPaint.color = android.graphics.Color.rgb(101, 67, 33)  // Dark brown
+        blessingPaint.color = getColor(
+            android.graphics.Color.rgb(101, 67, 33),  // Dark brown (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val blessing = "🌺 ಶ್ರೀ ರಾಘವೇಂದ್ರ ಸ್ವಾಮಿಗಳವರ ಅನುಗ್ರಹ ಸದಾ ಇರಲಿ 🌺"
         val blessingWidth = blessingPaint.measureText(blessing)
         canvas.drawText(blessing, (PAGE_WIDTH - blessingWidth) / 2, y, blessingPaint)
@@ -299,27 +359,33 @@ class PDFGenerator(private val context: Context) {
         canvas.drawText(sig, (PAGE_WIDTH - sigWidth) / 2, y, sigPaint)
         y += 8f + 10f
         
-        // Decorative line (orange)
+        // Decorative line
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
         y += 8f
         
-        // Final mantra (centered, bold, dark red)
+        // Final mantra (centered, bold)
         val finalMantraPaint = createTextPaint(9f, bold = true)
-        finalMantraPaint.color = android.graphics.Color.rgb(139, 0, 0)  // Dark red
+        finalMantraPaint.color = getColor(
+            android.graphics.Color.rgb(139, 0, 0),  // Dark red (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val finalMantra1 = "ಶ್ರೀ ರಾಘವೇಂದ್ರಾಯ ನಮః"
         val finalMantra1Width = finalMantraPaint.measureText(finalMantra1)
         canvas.drawText(finalMantra1, (PAGE_WIDTH - finalMantra1Width) / 2, y, finalMantraPaint)
         y += 9f + 3f
         
-        // Universal peace mantra (centered, dark brown)
+        // Universal peace mantra (centered)
         val peacePaint = createTextPaint(8f)
-        peacePaint.color = android.graphics.Color.rgb(101, 67, 33)  // Dark brown
+        peacePaint.color = getColor(
+            android.graphics.Color.rgb(101, 67, 33),  // Dark brown (color)
+            android.graphics.Color.BLACK  // Black (B&W)
+        )
         val peace = "ಸರ್ವೇ ಜನಾಃ ಸುಖಿನೋ ಭವಂತು"
         val peaceWidth = peacePaint.measureText(peace)
         canvas.drawText(peace, (PAGE_WIDTH - peaceWidth) / 2, y, peacePaint)
         y += 8f + 5f
         
-        // Final decorative line (orange)
+        // Final decorative line
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
     }
 }
