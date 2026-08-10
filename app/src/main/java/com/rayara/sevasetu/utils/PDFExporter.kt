@@ -35,12 +35,36 @@ class PDFExporter(private val context: Context) {
     
     private fun getKannadaFont(): PdfFont? {
         return try {
-            PdfFontFactory.createFont("/system/fonts/NotoSansKannada-Regular.ttf", PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED)
+            // First try to load from bundled assets (guaranteed to work)
+            val assetManager = context.assets
+            val fontStream = assetManager.open("fonts/NotoSansKannada-Regular.ttf")
+            val fontBytes = fontStream.readBytes()
+            fontStream.close()
+            
+            PdfFontFactory.createFont(
+                fontBytes, 
+                PdfEncodings.IDENTITY_H, 
+                PdfFontFactory.EmbeddingStrategy.FORCE_EMBEDDED
+            )
         } catch (e: Exception) {
             try {
-                PdfFontFactory.createFont("/system/fonts/DroidSansFallback.ttf", PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED)
+                // Fallback to system font if assets fail
+                PdfFontFactory.createFont(
+                    "/system/fonts/NotoSansKannada-Regular.ttf", 
+                    PdfEncodings.IDENTITY_H, 
+                    PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
+                )
             } catch (e2: Exception) {
-                null
+                try {
+                    // Last fallback
+                    PdfFontFactory.createFont(
+                        "/system/fonts/DroidSansFallback.ttf", 
+                        PdfEncodings.IDENTITY_H, 
+                        PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
+                    )
+                } catch (e3: Exception) {
+                    null
+                }
             }
         }
     }
