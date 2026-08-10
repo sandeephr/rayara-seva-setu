@@ -25,7 +25,8 @@ import com.rayara.sevasetu.utils.Constants
 @Composable
 fun BillingScreen(
     viewModel: BillingViewModel = viewModel(),
-    onNavigateToHistory: () -> Unit
+    onNavigateToHistory: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -56,6 +57,9 @@ fun BillingScreen(
             TopAppBar(
                 title = { Text("ರಾಯರ ಸೇವಾ ಸೇತು") },
                 actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(Icons.Default.Settings, contentDescription = "ಸೆಟ್ಟಿಂಗ್ಸ್")
+                    }
                     IconButton(onClick = onNavigateToHistory) {
                         Icon(Icons.Default.History, contentDescription = "ಇತಿಹಾಸ")
                     }
