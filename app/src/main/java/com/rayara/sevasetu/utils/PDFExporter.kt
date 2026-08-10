@@ -135,11 +135,13 @@ class PDFExporter(private val context: Context) {
     }
     
     private fun addSummaryRow(table: Table, font: PdfFont?, label: String, value: String) {
-        val labelCell = Cell().add(Paragraph(label).setFontSize(10f).setBold())
-        font?.let { labelCell.children[0].setFont(it) }
+        val labelPara = Paragraph(label).setFontSize(10f).setBold()
+        font?.let { labelPara.setFont(it) }
+        val labelCell = Cell().add(labelPara)
         
-        val valueCell = Cell().add(Paragraph(value).setFontSize(10f).setTextAlignment(TextAlignment.RIGHT))
-        font?.let { valueCell.children[0].setFont(it) }
+        val valuePara = Paragraph(value).setFontSize(10f).setTextAlignment(TextAlignment.RIGHT)
+        font?.let { valuePara.setFont(it) }
+        val valueCell = Cell().add(valuePara)
         
         table.addCell(labelCell)
         table.addCell(valueCell)
@@ -176,15 +178,17 @@ class PDFExporter(private val context: Context) {
     }
     
     private fun addTableHeader(table: Table, font: PdfFont?, text: String) {
-        val cell = Cell().add(Paragraph(text).setFontSize(9f).setBold())
-        font?.let { cell.children[0].setFont(it) }
+        val para = Paragraph(text).setFontSize(9f).setBold()
+        font?.let { para.setFont(it) }
+        val cell = Cell().add(para)
         cell.setBackgroundColor(com.itextpdf.kernel.colors.ColorConstants.LIGHT_GRAY)
         table.addHeaderCell(cell)
     }
     
     private fun addTableCell(table: Table, font: PdfFont?, text: String, alignment: TextAlignment = TextAlignment.LEFT) {
-        val cell = Cell().add(Paragraph(text).setFontSize(8f).setTextAlignment(alignment))
-        font?.let { cell.children[0].setFont(it) }
+        val para = Paragraph(text).setFontSize(8f).setTextAlignment(alignment)
+        font?.let { para.setFont(it) }
+        val cell = Cell().add(para)
         table.addCell(cell)
     }
     
