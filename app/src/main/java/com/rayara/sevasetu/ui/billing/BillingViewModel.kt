@@ -124,7 +124,8 @@ class BillingViewModel(application: Application) : AndroidViewModel(application)
                     val updatedReceipt = savedReceipt.copy(pdfPath = pdfFile.absolutePath)
                     repository.updateReceipt(updatedReceipt)
                     
-                    _uiState.value = state.copy(
+                    // Clear form data but keep preview dialog open
+                    _uiState.value = BillingUiState(
                         isLoading = false,
                         showPreviewDialog = true,
                         previewReceipt = updatedReceipt,

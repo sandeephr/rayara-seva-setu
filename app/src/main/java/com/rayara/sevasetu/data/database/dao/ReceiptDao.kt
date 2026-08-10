@@ -65,4 +65,15 @@ interface ReceiptDao {
     
     @Query("DELETE FROM receipts WHERE isDeleted = 1")
     suspend fun permanentlyDeleteSoftDeleted()
+    
+    @Query("SELECT * FROM receipts WHERE isDeleted = 0 ORDER BY timestamp DESC")
+    suspend fun getAllReceiptsList(): List<Receipt>
+    
+    @Query("""
+        SELECT * FROM receipts 
+        WHERE isDeleted = 0 
+        AND date BETWEEN :startDate AND :endDate
+        ORDER BY timestamp DESC
+    """)
+    suspend fun getReceiptsByDateRange(startDate: String, endDate: String): List<Receipt>
 }

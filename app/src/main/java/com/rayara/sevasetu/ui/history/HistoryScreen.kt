@@ -27,6 +27,18 @@ fun HistoryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    var showExportDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    
+    if (showExportDialog) {
+        HistoryExportDialog(
+            onDismiss = { showExportDialog = false },
+            onExport = { type, startDate, endDate ->
+                viewModel.exportTransactions(context, startDate, endDate)
+                showExportDialog = false
+            }
+        )
+    }
     
     Scaffold(
         topBar = {
@@ -37,10 +49,16 @@ fun HistoryScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "ಹಿಂದೆ")
                     }
                 },
+                actions = {
+                    IconButton(onClick = { showExportDialog = true }) {
+                        Icon(Icons.Default.Download, contentDescription = "ರಫ್ತು ಮಾಡಿ")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }

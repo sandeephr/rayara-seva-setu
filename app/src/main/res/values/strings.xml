@@ -2,77 +2,120 @@
 <resources>
     <string name="app_name">Rayara Seva Setu</string>
     
-    <!-- Organization Details -->
-    <string name="org_name">ಶ್ರೀ ರಾಘವೇಂದ್ರಸ್ವಾಮಿಗಳ ಬ್ರಂದಾವನ</string>
-    <string name="org_address">ಭ್ರಾಹ್ಮಣರ ಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ</string>
-    <string name="org_trust">ಶ್ರೀ ರಾಘವೇಂದ್ರ ಗುರುಸಾರ್ವಭೌಮ ಸೇವಾ ಟ್ರಸ್ಟ್ (ರಿ.)</string>
+    <!-- Organization Details (English) -->
+    <string name="org_name">Sri Raghavendra Swamy Brindavan</string>
+    <string name="org_address">Brahmin Street, Doddaballapur</string>
+    <string name="org_trust">Sri Raghavendra Gurusarvabhouma Seva Trust (R.)</string>
     
     <!-- Main Screen -->
-    <string name="new_receipt">ಹೊಸ ರಶೀದಿ</string>
-    <string name="history">ಇತಿಹಾಸ</string>
-    <string name="settings">ಸಂಯೋಜನೆಗಳು</string>
+    <string name="app_title">Rayara Seva Setu</string>
+    <string name="new_receipt">New Receipt</string>
+    <string name="history">History</string>
+    <string name="settings">Settings</string>
+    <string name="language">Language</string>
+    <string name="back">Back</string>
     
     <!-- Customer Details -->
-    <string name="customer_details">ಗ್ರಾಹಕರ ವಿವರಗಳು</string>
-    <string name="customer_name">ಶ್ರೀಮತಿ / ಶ್ರೀ</string>
-    <string name="customer_name_hint">ಹೆಸರು ನಮೂದಿಸಿ</string>
-    <string name="phone_number">ದೂರವಾಣಿ ಸಂಖ್ಯೆ</string>
-    <string name="phone_hint">ದೂರವಾಣಿ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ</string>
-    <string name="optional_for_small_amounts">(₹500 ಕ್ಕಿಂತ ಹೆಚ್ಚಿಗೆ ಅಗತ್ಯ)</string>
-    <string name="default_customer_name">ಶ್ರೀ ರಾಯರ ಸೇವಾರ್ಥಿ</string>
+    <string name="customer_details">Customer Details</string>
+    <string name="customer_name">Name</string>
+    <string name="customer_name_hint">Enter customer name</string>
+    <string name="customer_name_label">Mrs. / Mr.</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="phone_hint">Enter phone number</string>
+    <string name="phone_label">Phone:</string>
+    <string name="optional_for_small_amounts">(Required for amounts above ₹500)</string>
+    <string name="default_customer_name">Sri Rayara Devotee</string>
     
     <!-- Services -->
-    <string name="select_service">ಸೇವೆ ಆಯ್ಕೆಮಾಡಿ</string>
-    <string name="seva">ಸೇವೆ</string>
-    <string name="custom_amount">ಕಸ್ಟಮ್ ಮೊತ್ತ</string>
-    <string name="enter_amount">ಮೊತ್ತ ನಮೂದಿಸಿ</string>
+    <string name="select_service">Select Service</string>
+    <string name="service_amount">Service Amount</string>
+    <string name="seva">Service</string>
+    <string name="custom_amount">Custom Amount</string>
+    <string name="enter_amount">Enter amount</string>
     
     <!-- Payment Mode -->
-    <string name="payment_mode">ಪಾವತಿ ವಿಧಾನ</string>
-    <string name="cash">ನಗದು</string>
+    <string name="payment_mode">Payment Mode</string>
+    <string name="payment_mode_label">Payment:</string>
+    <string name="cash">Cash</string>
     <string name="phonepe">PhonePe</string>
-    <string name="online">ಆನ್‌ಲೈನ್</string>
+    <string name="online">Online</string>
     
     <!-- Receipt -->
-    <string name="receipt_no">ಸಂ.</string>
-    <string name="date">ದಿನಾಂಕ</string>
-    <string name="total">ಒಟ್ಟು</string>
-    <string name="thank_you">ಧನ್ಯವಾದಗಳು</string>
+    <string name="receipt_no">No.</string>
+    <string name="receipt_number">Receipt Number</string>
+    <string name="date">Date</string>
+    <string name="date_label">Date:</string>
+    <string name="total">Total</string>
+    <string name="total_label">Total:</string>
+    <string name="thank_you">Thank You</string>
+    <string name="receipt_preview">Receipt Preview</string>
     
     <!-- Actions -->
-    <string name="generate_receipt">ರಶೀದಿ ರಚಿಸಿ</string>
-    <string name="print">ಮುದ್ರಿಸಿ</string>
-    <string name="share">ಹಂಚಿಕೊಳ್ಳಿ</string>
-    <string name="clear">ತೆರವುಗೊಳಿಸಿ</string>
-    <string name="save">ಉಳಿಸಿ</string>
-    <string name="cancel">ರದ್ದುಮಾಡಿ</string>
-    <string name="delete">ಅಳಿಸಿ</string>
-    <string name="edit">ಸಂಪಾದಿಸಿ</string>
+    <string name="generate_receipt">Generate Receipt</string>
+    <string name="print">Print</string>
+    <string name="print_share">Print / Share</string>
+    <string name="share">Share</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="close">Close</string>
+    <string name="export">Export</string>
+    <string name="download">Download</string>
+    <string name="new_bill">New Bill</string>
     
     <!-- History -->
-    <string name="search_receipt">ರಶೀದಿ ಹುಡುಕಿ</string>
-    <string name="search_hint">ರಶೀದಿ ಸಂಖ್ಯೆ ಅಥವಾ ಹೆಸರು</string>
-    <string name="today_total">ಇಂದಿನ ಒಟ್ಟು</string>
-    <string name="no_receipts">ರಶೀದಿಗಳು ಇಲ್ಲ</string>
-    <string name="reprint">ಮರುಮುದ್ರಣ</string>
+    <string name="search_receipt">Search Receipt</string>
+    <string name="search_hint">Receipt number or name</string>
+    <string name="today_total">Today\'s Total</string>
+    <string name="today_receipts">Today\'s Receipts</string>
+    <string name="no_receipts">No receipts found</string>
+    <string name="no_receipts_message">No receipts available</string>
+    <string name="reprint">Reprint</string>
+    <string name="receipts">Receipts</string>
+    
+    <!-- Export -->
+    <string name="export_transactions">Export Transactions</string>
+    <string name="select_period">Select Period:</string>
+    <string name="this_month">This Month</string>
+    <string name="last_month">Last Month</string>
+    <string name="this_year">This Year</string>
+    <string name="custom_range">Custom Range</string>
+    <string name="start_date">Start Date (DD/MM/YYYY)</string>
+    <string name="end_date">End Date (DD/MM/YYYY)</string>
+    <string name="transaction_report">Transaction Report</string>
+    <string name="from_to">From %1$s to %2$s</string>
+    <string name="summary">Summary</string>
+    <string name="total_transactions">Total Transactions:</string>
+    <string name="total_amount">Total Amount:</string>
+    <string name="detailed_transactions">Detailed Transactions</string>
+    <string name="open_report">Open Transaction Report</string>
     
     <!-- Validation Messages -->
-    <string name="error_name_required">ದಯವಿಟ್ಟು ಹೆಸರು ನಮೂದಿಸಿ</string>
-    <string name="error_phone_required">ದಯವಿಟ್ಟು ದೂರವಾಣಿ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ</string>
-    <string name="error_phone_invalid">ಅಮಾನ್ಯ ದೂರವಾಣಿ ಸಂಖ್ಯೆ</string>
-    <string name="error_amount_required">ದಯವಿಟ್ಟು ಮೊತ್ತ ಆಯ್ಕೆಮಾಡಿ</string>
-    <string name="error_payment_mode_required">ದಯವಿಟ್ಟು ಪಾವತಿ ವಿಧಾನ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="error_name_required">Please enter name</string>
+    <string name="error_phone_required">Please enter phone number</string>
+    <string name="error_phone_invalid">Invalid phone number</string>
+    <string name="error_amount_required">Please select amount</string>
+    <string name="error_payment_mode_required">Please select payment mode</string>
+    <string name="error_name_required_above_500">Name required for amounts above ₹500</string>
+    <string name="error_phone_required_above_500">Phone number required for amounts above ₹500</string>
     
     <!-- Success Messages -->
-    <string name="receipt_generated">ರಶೀದಿ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ</string>
-    <string name="receipt_saved">ರಶೀದಿ ಉಳಿಸಲಾಗಿದೆ</string>
-    <string name="receipt_deleted">ರಶೀದಿ ಅಳಿಸಲಾಗಿದೆ</string>
+    <string name="receipt_generated">Receipt generated successfully</string>
+    <string name="receipt_generated_success">Receipt generated successfully!</string>
+    <string name="receipt_saved">Receipt saved</string>
+    <string name="receipt_deleted">Receipt deleted</string>
+    <string name="receipt_save_failed">Failed to save receipt</string>
     
     <!-- Settings -->
-    <string name="receipt_settings">ರಶೀದಿ ಸಂಯೋಜನೆಗಳು</string>
-    <string name="printer_settings">ಮುದ್ರಕ ಸಂಯೋಜನೆಗಳು</string>
-    <string name="about">ಕುರಿತು</string>
-    <string name="version">ಆವೃತ್ತಿ</string>
+    <string name="receipt_settings">Receipt Settings</string>
+    <string name="printer_settings">Printer Settings</string>
+    <string name="about">About</string>
+    <string name="version">Version</string>
+    <string name="select_language">Select Language</string>
+    <string name="english">English</string>
+    <string name="kannada">ಕನ್ನಡ (Kannada)</string>
     
     <!-- File Provider -->
     <string name="file_provider_authority">com.rayara.sevasetu.fileprovider</string>

@@ -85,6 +85,9 @@ dependencies {
     // PDF Generation
     implementation("com.itextpdf:itext7-core:7.2.5")
     
+    // Bluetooth Thermal Printer
+    implementation("com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.3.0")
+    
     // Date/Time
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
     

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ರಾಯರ ಸೇವಾ ಸೇತು</string>
+    
+    <!-- Organization Details (Kannada) -->
+    <string name="org_name">ಶ್ರೀ ರಾಘವೇಂದ್ರಸ್ವಾಮಿಗಳ ಬ್ರಂದಾವನ</string>
+    <string name="org_address">ಭ್ರಾಹ್ಮಣರ ಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ</string>
+    <string name="org_trust">ಶ್ರೀ ರಾಘವೇಂದ್ರ ಗುರುಸಾರ್ವಭೌಮ ಸೇವಾ ಟ್ರಸ್ಟ್ (ರಿ.)</string>
+    
+    <!-- Main Screen -->
+    <string name="app_title">ರಾಯರ ಸೇವಾ ಸೇತು</string>
+    <string name="new_receipt">ಹೊಸ ರಶೀದಿ</string>
+    <string name="history">ಇತಿಹಾಸ</string>
+    <string name="settings">ಸಂಯೋಜನೆಗಳು</string>
+    <string name="language">ಭಾಷೆ</string>
+    <string name="back">ಹಿಂದೆ</string>
+    
+    <!-- Customer Details -->
+    <string name="customer_details">ಗ್ರಾಹಕರ ವಿವರಗಳು</string>
+    <string name="customer_name">ಹೆಸರು</string>
+    <string name="customer_name_hint">ಹೆಸರು ನಮೂದಿಸಿ</string>
+    <string name="customer_name_label">ಶ್ರೀಮತಿ / ಶ್ರೀ</string>
+    <string name="phone_number">ದೂರವಾಣಿ ಸಂಖ್ಯೆ</string>
+    <string name="phone_hint">ದೂರವಾಣಿ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ</string>
+    <string name="phone_label">ದೂರವಾಣಿ:</string>
+    <string name="optional_for_small_amounts">(₹500 ಕ್ಕಿಂತ ಹೆಚ್ಚಿಗೆ ಅಗತ್ಯ)</string>
+    <string name="default_customer_name">ಶ್ರೀ ರಾಯರ ಸೇವಾರ್ಥಿ</string>
+    
+    <!-- Services -->
+    <string name="select_service">ಸೇವೆ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="service_amount">ಸೇವೆ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="seva">ಸೇವೆ</string>
+    <string name="custom_amount">ಕಸ್ಟಮ್ ಮೊತ್ತ</string>
+    <string name="enter_amount">ಮೊತ್ತ ನಮೂದಿಸಿ</string>
+    
+    <!-- Payment Mode -->
+    <string name="payment_mode">ಪಾವತಿ ವಿಧಾನ</string>
+    <string name="payment_mode_label">ಪಾವತಿ:</string>
+    <string name="cash">ನಗದು</string>
+    <string name="phonepe">PhonePe</string>
+    <string name="online">ಆನ್‌ಲೈನ್</string>
+    
+    <!-- Receipt -->
+    <string name="receipt_no">ಸಂ.</string>
+    <string name="receipt_number">ರಶೀದಿ ಸಂಖ್ಯೆ</string>
+    <string name="date">ದಿನಾಂಕ</string>
+    <string name="date_label">ದಿನಾಂಕ:</string>
+    <string name="total">ಒಟ್ಟು</string>
+    <string name="total_label">ಒಟ್ಟು:</string>
+    <string name="thank_you">ಧನ್ಯವಾದಗಳು</string>
+    <string name="receipt_preview">ರಶೀದಿ ಪೂರ್ವವೀಕ್ಷಣೆ</string>
+    
+    <!-- Actions -->
+    <string name="generate_receipt">ರಶೀದಿ ರಚಿಸಿ</string>
+    <string name="print">ಮುದ್ರಿಸಿ</string>
+    <string name="print_share">ಮುದ್ರಿಸಿ / ಹಂಚಿಕೊಳ್ಳಿ</string>
+    <string name="share">ಹಂಚಿಕೊಳ್ಳಿ</string>
+    <string name="clear">ತೆರವುಗೊಳಿಸಿ</string>
+    <string name="save">ಉಳಿಸಿ</string>
+    <string name="cancel">ರದ್ದುಮಾಡಿ</string>
+    <string name="delete">ಅಳಿಸಿ</string>
+    <string name="edit">ಸಂಪಾದಿಸಿ</string>
+    <string name="close">ಮುಚ್ಚಿ</string>
+    <string name="export">ರಫ್ತು ಮಾಡಿ</string>
+    <string name="download">ಡೌನ್‌ಲೋಡ್</string>
+    <string name="new_bill">ಹೊಸ ರಶೀದಿ</string>
+    
+    <!-- History -->
+    <string name="search_receipt">ರಶೀದಿ ಹುಡುಕಿ</string>
+    <string name="search_hint">ರಶೀದಿ ಸಂಖ್ಯೆ ಅಥವಾ ಹೆಸರು</string>
+    <string name="today_total">ಇಂದಿನ ಒಟ್ಟು</string>
+    <string name="today_receipts">ಇಂದಿನ ರಶೀದಿಗಳು</string>
+    <string name="no_receipts">ರಶೀದಿಗಳು ಇಲ್ಲ</string>
+    <string name="no_receipts_message">ರಶೀದಿಗಳು ಲಭ್ಯವಿಲ್ಲ</string>
+    <string name="reprint">ಮರುಮುದ್ರಣ</string>
+    <string name="receipts">ರಶೀದಿಗಳು</string>
+    
+    <!-- Export -->
+    <string name="export_transactions">ವಹಿವಾಟು ರಫ್ತು ಮಾಡಿ</string>
+    <string name="select_period">ಅವಧಿ ಆಯ್ಕೆಮಾಡಿ:</string>
+    <string name="this_month">ಈ ತಿಂಗಳು</string>
+    <string name="last_month">ಕಳೆದ ತಿಂಗಳು</string>
+    <string name="this_year">ಈ ವರ್ಷ</string>
+    <string name="custom_range">ಕಸ್ಟಮ್ ಶ್ರೇಣಿ</string>
+    <string name="start_date">ಪ್ರಾರಂಭ ದಿನಾಂಕ (DD/MM/YYYY)</string>
+    <string name="end_date">ಅಂತಿಮ ದಿನಾಂಕ (DD/MM/YYYY)</string>
+    <string name="transaction_report">ವಹಿವಾಟು ವರದಿ</string>
+    <string name="from_to">%1$s ರಿಂದ %2$s ವರೆಗೆ</string>
+    <string name="summary">ಸಾರಾಂಶ</string>
+    <string name="total_transactions">ಒಟ್ಟು ವಹಿವಾಟುಗಳು:</string>
+    <string name="total_amount">ಒಟ್ಟು ಮೊತ್ತ:</string>
+    <string name="detailed_transactions">ವಿವರವಾದ ವಹಿವಾಟುಗಳು</string>
+    <string name="open_report">ವಹಿವಾಟು ವರದಿ ತೆರೆಯಿರಿ</string>
+    
+    <!-- Validation Messages -->
+    <string name="error_name_required">ದಯವಿಟ್ಟು ಹೆಸರು ನಮೂದಿಸಿ</string>
+    <string name="error_phone_required">ದಯವಿಟ್ಟು ದೂರವಾಣಿ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ</string>
+    <string name="error_phone_invalid">ಅಮಾನ್ಯ ದೂರವಾಣಿ ಸಂಖ್ಯೆ</string>
+    <string name="error_amount_required">ದಯವಿಟ್ಟು ಮೊತ್ತ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="error_payment_mode_required">ದಯವಿಟ್ಟು ಪಾವತಿ ವಿಧಾನ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="error_name_required_above_500">₹500 ಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಮೊತ್ತಕ್ಕೆ ಹೆಸರು ಅಗತ್ಯವಿದೆ</string>
+    <string name="error_phone_required_above_500">₹500 ಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಮೊತ್ತಕ್ಕೆ ದೂರವಾಣಿ ಸಂಖ್ಯೆ ಅಗತ್ಯವಿದೆ</string>
+    
+    <!-- Success Messages -->
+    <string name="receipt_generated">ರಶೀದಿ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ</string>
+    <string name="receipt_generated_success">ರಶೀದಿ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ!</string>
+    <string name="receipt_saved">ರಶೀದಿ ಉಳಿಸಲಾಗಿದೆ</string>
+    <string name="receipt_deleted">ರಶೀದಿ ಅಳಿಸಲಾಗಿದೆ</string>
+    <string name="receipt_save_failed">ರಶೀದಿ ಉಳಿಸಲು ವಿಫಲವಾಗಿದೆ</string>
+    
+    <!-- Settings -->
+    <string name="receipt_settings">ರಶೀದಿ ಸಂಯೋಜನೆಗಳು</string>
+    <string name="printer_settings">ಮುದ್ರಕ ಸಂಯೋಜನೆಗಳು</string>
+    <string name="about">ಕುರಿತು</string>
+    <string name="version">ಆವೃತ್ತಿ</string>
+    <string name="select_language">ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="english">English (ಇಂಗ್ಲಿಷ್)</string>
+    <string name="kannada">ಕನ್ನಡ</string>
+    
+    <!-- File Provider -->
+    <string name="file_provider_authority">com.rayara.sevasetu.fileprovider</string>
+</resources>

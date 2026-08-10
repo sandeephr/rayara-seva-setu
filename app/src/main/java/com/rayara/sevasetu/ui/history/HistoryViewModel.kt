@@ -1,11 +1,15 @@
 package com.rayara.sevasetu.ui.history
 
 import android.app.Application
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.rayara.sevasetu.data.database.AppDatabase
 import com.rayara.sevasetu.data.database.entities.Receipt
 import com.rayara.sevasetu.data.repository.ReceiptRepository
+import com.rayara.sevasetu.utils.PDFExporter
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -62,6 +66,29 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
     fun deleteReceipt(receipt: Receipt) {
         viewModelScope.launch {
             repository.deleteReceipt(receipt)
+        }
+    }
+    
+    fun exportTransactions(context: Context, startDate: String, endDate: String) {
+        viewModelScope.launch {
+            try {
+                val receipts = repository.getReceiptsByDateRange(startDate, endDate)
+                val pdfExporter = PDFExporter(context)
+                val pdfFile = pdfExporter.exportTransactions(receipts, startDate, endDate)
+                
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    pdfFile
+                )
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/pdf")
+                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                }
+                context.startActivity(Intent.createChooser(intent, "ವಹಿವಾಟು ವರದಿ ತೆರೆಯಿರಿ"))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

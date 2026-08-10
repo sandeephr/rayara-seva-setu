@@ -72,4 +72,40 @@ class ReceiptRepository(private val receiptDao: ReceiptDao) {
         val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
         return timeFormat.format(Date())
     }
+    
+    suspend fun getReceiptsByDateRange(startDate: String, endDate: String): List<Receipt> {
+        return receiptDao.getReceiptsByDateRange(startDate, endDate)
+    }
+    
+    suspend fun getReceiptsByMonth(month: Int, year: Int): List<Receipt> {
+        val receipts = receiptDao.getAllReceiptsList()
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        
+        return receipts.filter { receipt ->
+            try {
+                val receiptDate = dateFormat.parse(receipt.date)
+                val calendar = Calendar.getInstance()
+                calendar.time = receiptDate
+                calendar.get(Calendar.MONTH) == month - 1 && calendar.get(Calendar.YEAR) == year
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
+    
+    suspend fun getReceiptsByYear(year: Int): List<Receipt> {
+        val receipts = receiptDao.getAllReceiptsList()
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        
+        return receipts.filter { receipt ->
+            try {
+                val receiptDate = dateFormat.parse(receipt.date)
+                val calendar = Calendar.getInstance()
+                calendar.time = receiptDate
+                calendar.get(Calendar.YEAR) == year
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
 }
