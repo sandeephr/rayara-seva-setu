@@ -21,9 +21,9 @@ data class User(
     
     val isVerified: Boolean = false,
     
-    val createdAt: Long = System.currentTimeMillis(),
+    val createdAt: Long = 0L,
     
-    val lastLoginAt: Long = System.currentTimeMillis(),
+    val lastLoginAt: Long = 0L,
     
     val currentDeviceId: String? = null,
     

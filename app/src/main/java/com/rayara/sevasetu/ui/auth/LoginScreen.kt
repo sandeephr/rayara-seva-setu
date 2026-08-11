@@ -51,23 +51,25 @@ fun LoginScreen(
         ) {
             // Logo/Title
             Text(
-                text = "�",
-                style = MaterialTheme.typography.displayLarge
+                text = "|| ಶ್ರೀ ಗುರುರಾಜೋ ವಿಜಯತೇ ||",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "ಶ್ರೀ ರಾಘವೇಂದ್ರಸ್ವಾಮಿಗಳ ಬ್ರಂದಾವನ",
+                text = "ಶ್ರೀ ರಾಘವೇಂದ್ರಸ್ವಾಮಿಗಳ ಬೃಂದಾವನ",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "ಭ್ರಾಹ್ಮಣರ ಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ.",
+                text = "ಬ್ರಾಹ್ಮಣರಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
