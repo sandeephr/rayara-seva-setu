@@ -164,16 +164,16 @@ class PDFGenerator(private val context: Context) {
         canvas.drawText(mantra, (PAGE_WIDTH - mantraWidth) / 2, y, mantraPaint)
         y += 10f + 5f
         
-        // Organization name with temple emoji (centered, bold)
-        val titlePaint = createTextPaint(TITLE_SIZE, bold = true)
+        // Organization name (centered, bold, smaller size to fit)
+        val titlePaint = createTextPaint(11f, bold = true)
         titlePaint.color = getColor(
             android.graphics.Color.rgb(139, 0, 0),  // Dark red (color)
             android.graphics.Color.BLACK  // Black (B&W)
         )
-        val orgName = "🛕 ${Constants.Organization.NAME} 🛕"
+        val orgName = Constants.Organization.NAME
         val orgNameWidth = titlePaint.measureText(orgName)
         canvas.drawText(orgName, (PAGE_WIDTH - orgNameWidth) / 2, y, titlePaint)
-        y += TITLE_SIZE + 3f
+        y += 11f + 3f
         
         // Organization address (centered)
         val subtitlePaint = createTextPaint(SUBTITLE_SIZE)

@@ -163,14 +163,14 @@ fun RayaraSevaSetuApp() {
         }
         
         composable("settings") {
+            val activity = context as? ComponentActivity
             SettingsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onLogout = {
-                    navController.navigate("login") {
-                        popUpTo(0) { inclusive = true }
-                    }
+                    // Restart activity to force fresh auth check
+                    activity?.recreate()
                 }
             )
         }

@@ -211,12 +211,13 @@ class PDFExporter(private val context: Context) {
         y += SUBTITLE_SIZE + 10f
         
         // Column widths (percentages of content width)
-        val col1Width = CONTENT_WIDTH * 0.10f  // ಸಂ.
-        val col2Width = CONTENT_WIDTH * 0.15f  // ದಿನಾಂಕ
-        val col3Width = CONTENT_WIDTH * 0.25f  // ಗ್ರಾಹಕ
-        val col4Width = CONTENT_WIDTH * 0.20f  // ದೂರವಾಣಿ
-        val col5Width = CONTENT_WIDTH * 0.15f  // ಮೊತ್ತ
-        val col6Width = CONTENT_WIDTH * 0.15f  // ಪಾವತಿ
+        val col1Width = CONTENT_WIDTH * 0.08f  // ಸಂ.
+        val col2Width = CONTENT_WIDTH * 0.12f  // ದಿನಾಂಕ
+        val col3Width = CONTENT_WIDTH * 0.20f  // ಗ್ರಾಹಕ
+        val col4Width = CONTENT_WIDTH * 0.15f  // ದೂರವಾಣಿ
+        val col5Width = CONTENT_WIDTH * 0.12f  // ಮೊತ್ತ
+        val col6Width = CONTENT_WIDTH * 0.13f  // ಪಾವತಿ
+        val col7Width = CONTENT_WIDTH * 0.20f  // ರಚಿಸಿದವರು
         
         // Column X positions
         val col1X = MARGIN
@@ -225,6 +226,7 @@ class PDFExporter(private val context: Context) {
         val col4X = col3X + col3Width
         val col5X = col4X + col4Width
         val col6X = col5X + col5Width
+        val col7X = col6X + col6Width
         
         // Header row (with gray background)
         val headerPaint = createTextPaint(TABLE_HEADER_SIZE, bold = true)
@@ -239,6 +241,7 @@ class PDFExporter(private val context: Context) {
         canvas.drawText("ದೂರವಾಣಿ", col4X + 2f, y, headerPaint)
         canvas.drawText("ಮೊತ್ತ", col5X + 2f, y, headerPaint)
         canvas.drawText("ಪಾವತಿ", col6X + 2f, y, headerPaint)
+        canvas.drawText("ರಚಿಸಿದವರು", col7X + 2f, y, headerPaint)
         y += 5f
         
         // Table border
@@ -258,6 +261,7 @@ class PDFExporter(private val context: Context) {
             canvas.drawText(receipt.customerPhone, col4X + 2f, y, cellPaint)
             canvas.drawText(receipt.getFormattedAmount(), col5X + 2f, y, cellPaint)
             canvas.drawText(receipt.getPaymentModeEnum().kannadaName, col6X + 2f, y, cellPaint)
+            canvas.drawText(receipt.createdByUserName, col7X + 2f, y, cellPaint)
             y += TABLE_CELL_SIZE + 5f
         }
     }

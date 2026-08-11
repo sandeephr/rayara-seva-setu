@@ -51,16 +51,24 @@ fun LoginScreen(
         ) {
             // Logo/Title
             Text(
-                text = "🕉️",
+                text = "�",
                 style = MaterialTheme.typography.displayLarge
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "ಶ್ರೀ ರಾಯರ ಮಠ - ಮಂತ್ರಾಲಯ",
-                style = MaterialTheme.typography.headlineSmall,
+                text = "ಶ್ರೀ ರಾಘವೇಂದ್ರಸ್ವಾಮಿಗಳ ಬ್ರಂದಾವನ",
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = "ಭ್ರಾಹ್ಮಣರ ಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ.",
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
             

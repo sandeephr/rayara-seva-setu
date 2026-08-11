@@ -13,11 +13,11 @@ import androidx.room.PrimaryKey
 )
 data class User(
     @PrimaryKey
-    val userId: String,
+    val userId: String = "",
     
-    val name: String,
+    val name: String = "",
     
-    val mobileNumber: String,
+    val mobileNumber: String = "",
     
     val isVerified: Boolean = false,
     
