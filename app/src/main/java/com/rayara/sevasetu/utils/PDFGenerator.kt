@@ -12,9 +12,9 @@ import java.io.FileOutputStream
 
 class PDFGenerator(private val context: Context) {
     
-    // Page dimensions (A6 size in points: 297 x 420)
+    // Page dimensions (A6 size in points: 297 x 420, increased to 500 for content)
     private val PAGE_WIDTH = 297f
-    private val PAGE_HEIGHT = 420f
+    private val PAGE_HEIGHT = 550f
     private val MARGIN = 20f
     private val CONTENT_WIDTH = PAGE_WIDTH - (2 * MARGIN)
     
@@ -107,43 +107,8 @@ class PDFGenerator(private val context: Context) {
     private fun drawHeader(canvas: Canvas, startY: Float): Float {
         var y = startY
         
-        // Draw background (gradient for color, light gray for B&W)
-        val headerHeight = 80f
-        if (isColorMode) {
-            val backgroundPaint = Paint().apply {
-                shader = android.graphics.LinearGradient(
-                    0f, y, 0f, y + headerHeight,
-                    intArrayOf(
-                        android.graphics.Color.rgb(255, 153, 51),  // Saffron
-                        android.graphics.Color.rgb(255, 204, 153)  // Light orange
-                    ),
-                    null,
-                    android.graphics.Shader.TileMode.CLAMP
-                )
-            }
-            canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + headerHeight, backgroundPaint)
-        } else {
-            // B&W mode: light gray background
-            val backgroundPaint = Paint().apply {
-                color = android.graphics.Color.rgb(240, 240, 240)  // Light gray
-            }
-            canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + headerHeight, backgroundPaint)
-        }
-        
-        // Draw decorative border
-        val borderPaint = Paint().apply {
-            color = getColor(
-                android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color mode)
-                android.graphics.Color.BLACK  // Black (B&W mode)
-            )
-            strokeWidth = if (isColorMode) 3f else 2f
-            style = Paint.Style.STROKE
-        }
-        canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + headerHeight, borderPaint)
-        y += 10f
-        
         // Om symbol (centered)
-        val omPaint = createTextPaint(16f, bold = true)
+        val omPaint = createTextPaint(18f, bold = true)
         omPaint.color = getColor(
             android.graphics.Color.rgb(139, 0, 0),  // Dark red (color)
             android.graphics.Color.BLACK  // Black (B&W)
@@ -151,7 +116,7 @@ class PDFGenerator(private val context: Context) {
         val om = "ॐ"
         val omWidth = omPaint.measureText(om)
         canvas.drawText(om, (PAGE_WIDTH - omWidth) / 2, y, omPaint)
-        y += 16f + 3f
+        y += 18f + 8f
         
         // Guru mantra (centered)
         val mantraPaint = createTextPaint(10f)
@@ -197,16 +162,16 @@ class PDFGenerator(private val context: Context) {
         canvas.drawText(raghavendra, (PAGE_WIDTH - raghavendraWidth) / 2, y, smallMantraPaint)
         y += 8f + 10f
         
-        // Decorative line
-        val linePaint = Paint().apply {
+        // Thick decorative line
+        val thickLinePaint = Paint().apply {
             color = getColor(
                 android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color)
                 android.graphics.Color.BLACK  // Black (B&W)
             )
-            strokeWidth = 2f
+            strokeWidth = 3f
         }
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 10f
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
+        y += 12f
         
         return y
     }
@@ -256,18 +221,16 @@ class PDFGenerator(private val context: Context) {
             y += 10f
         }
         
-        // Decorative double line
-        val linePaint = Paint().apply {
+        // Single thick line
+        val thickLinePaint = Paint().apply {
             color = getColor(
-                android.graphics.Color.rgb(255, 153, 51),  // Saffron (color)
+                android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color)
                 android.graphics.Color.BLACK  // Black (B&W)
             )
-            strokeWidth = 1.5f
+            strokeWidth = 2.5f
         }
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 3f
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 10f
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
+        y += 12f
         
         // Service details title (centered)
         val serviceTitlePaint = createTextPaint(10f, bold = true)
@@ -278,13 +241,11 @@ class PDFGenerator(private val context: Context) {
         val serviceTitle = "ಸೇವೆಯ ವಿವರ"
         val serviceTitleWidth = serviceTitlePaint.measureText(serviceTitle)
         canvas.drawText(serviceTitle, (PAGE_WIDTH - serviceTitleWidth) / 2, y, serviceTitlePaint)
-        y += 10f + 8f
+        y += 10f + 10f
         
-        // Decorative double line
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 3f
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 10f
+        // Single thick line
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
+        y += 12f
         
         return y
     }
@@ -300,18 +261,16 @@ class PDFGenerator(private val context: Context) {
         canvas.drawText(amountText, PAGE_WIDTH - MARGIN - amountWidth, y, normalPaint)
         y += NORMAL_SIZE + 10f
         
-        // Decorative double line
-        val linePaint = Paint().apply {
+        // Single thick line
+        val thickLinePaint = Paint().apply {
             color = getColor(
-                android.graphics.Color.rgb(255, 153, 51),  // Saffron (color)
+                android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color)
                 android.graphics.Color.BLACK  // Black (B&W)
             )
-            strokeWidth = 1.5f
+            strokeWidth = 2.5f
         }
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 3f
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 10f
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
+        y += 12f
         
         // Total (bold, larger)
         val boldPaint = createTextPaint(LARGE_SIZE, bold = true)
@@ -322,13 +281,11 @@ class PDFGenerator(private val context: Context) {
         canvas.drawText(Constants.Receipt.TOTAL_LABEL, MARGIN, y, boldPaint)
         val totalAmountWidth = boldPaint.measureText(amountText)
         canvas.drawText(amountText, PAGE_WIDTH - MARGIN - totalAmountWidth, y, boldPaint)
-        y += LARGE_SIZE + 8f
+        y += LARGE_SIZE + 10f
         
-        // Decorative double line
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 3f
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 10f
+        // Single thick line
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
+        y += 12f
         
         // Payment mode
         val paymentText = "${Constants.Receipt.PAYMENT_MODE_LABEL} ${receipt.getPaymentModeEnum().kannadaName}"
@@ -339,18 +296,18 @@ class PDFGenerator(private val context: Context) {
     }
     
     private fun drawFooter(canvas: Canvas, startY: Float, receipt: Receipt) {
-        var y = startY + 15f
+        var y = startY + 20f
         
-        // Decorative line
-        val linePaint = Paint().apply {
+        // Thick decorative line
+        val thickLinePaint = Paint().apply {
             color = getColor(
-                android.graphics.Color.rgb(255, 153, 51),  // Saffron (color)
+                android.graphics.Color.rgb(204, 102, 0),  // Dark orange (color)
                 android.graphics.Color.BLACK  // Black (B&W)
             )
-            strokeWidth = 2f
+            strokeWidth = 3f
         }
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 10f
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
+        y += 15f
         
         // Blessing with flowers (centered)
         val blessingPaint = createTextPaint(9f)
@@ -400,8 +357,8 @@ class PDFGenerator(private val context: Context) {
         y += 8f + 10f
         
         // Decorative line
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 8f
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
+        y += 10f
         
         // Final mantra (centered, bold)
         val finalMantraPaint = createTextPaint(9f, bold = true)
@@ -426,6 +383,6 @@ class PDFGenerator(private val context: Context) {
         y += 8f + 5f
         
         // Final decorative line
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
     }
 }

@@ -534,8 +534,16 @@ fun ReceiptPreviewDialog(
                             Text(receipt.date, style = MaterialTheme.typography.bodySmall)
                         }
                         
-                        Text("${receipt.customerName}", style = MaterialTheme.typography.bodyMedium)
-                        Text("${receipt.customerPhone}", style = MaterialTheme.typography.bodySmall)
+                        Text("${Constants.Receipt.CUSTOMER_PREFIX} ${receipt.customerName}", style = MaterialTheme.typography.bodyMedium)
+                        Text("${Constants.Receipt.PHONE_PREFIX} ${receipt.customerPhone}", style = MaterialTheme.typography.bodySmall)
+                        
+                        if (receipt.createdByUserName.isNotEmpty()) {
+                            Text("ರಚಿಸಿದವರು: ${receipt.createdByUserName}", 
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                         
                         Divider()
                         

@@ -328,6 +328,9 @@ fun SettingsScreen(
                                 "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            // Navigate back to force UI refresh
+                            kotlinx.coroutines.delay(500)
+                            onNavigateBack()
                         }
                     },
                     colors = ButtonDefaults.textButtonColors(
