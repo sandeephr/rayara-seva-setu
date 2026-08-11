@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.rayara.sevasetu.data.database.AppDatabase
 import com.rayara.sevasetu.data.database.entities.Receipt
 import com.rayara.sevasetu.data.repository.ReceiptRepository
+import com.rayara.sevasetu.sync.FirestoreSync
 import com.rayara.sevasetu.utils.PDFExporter
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -27,6 +28,19 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
     
     private val database = AppDatabase.getDatabase(application)
     private val repository = ReceiptRepository(database.receiptDao())
+    private val firestoreSync = FirestoreSync(application)
+    
+    init {
+        // Sync receipts from Firestore on startup
+        viewModelScope.launch {
+            try {
+                firestoreSync.performFullSync()
+                Log.d("HistoryViewModel", "Initial sync completed")
+            } catch (e: Exception) {
+                Log.e("HistoryViewModel", "Initial sync failed", e)
+            }
+        }
+    }
     
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()

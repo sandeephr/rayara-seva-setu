@@ -5,16 +5,20 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.rayara.sevasetu.data.database.dao.ReceiptDao
+import com.rayara.sevasetu.data.database.dao.UserDao
 import com.rayara.sevasetu.data.database.entities.Receipt
+import com.rayara.sevasetu.data.database.entities.User
 
 @Database(
-    entities = [Receipt::class],
-    version = 1,
+    entities = [Receipt::class, User::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     
     abstract fun receiptDao(): ReceiptDao
+    
+    abstract fun userDao(): UserDao
     
     companion object {
         @Volatile

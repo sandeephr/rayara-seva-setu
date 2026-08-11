@@ -29,6 +29,15 @@ class PDFGenerator(private val context: Context) {
     private val isColorMode: Boolean
         get() = prefsManager.isColorReceiptEnabled()
     
+    // Handwriting font for signature
+    private val signatureTypeface: Typeface by lazy {
+        try {
+            Typeface.createFromAsset(context.assets, "fonts/dancing_script.ttf")
+        } catch (e: Exception) {
+            Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
+        }
+    }
+    
     // Colors
     private fun getColor(colorValue: Int, bwValue: Int = android.graphics.Color.BLACK): Int {
         return if (isColorMode) colorValue else bwValue
@@ -344,6 +353,27 @@ class PDFGenerator(private val context: Context) {
         val blessingWidth = blessingPaint.measureText(blessing)
         canvas.drawText(blessing, (PAGE_WIDTH - blessingWidth) / 2, y, blessingPaint)
         y += 9f + 8f
+        
+        // Decorative line before signature
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
+        y += 10f
+        
+        // Username signature (centered, handwriting font, 10sp)
+        val signaturePaint = TextPaint().apply {
+            textSize = 10f
+            typeface = signatureTypeface
+            color = getColor(
+                android.graphics.Color.rgb(101, 67, 33),  // Dark brown (color)
+                android.graphics.Color.BLACK  // Black (B&W)
+            )
+            isAntiAlias = true
+        }
+        
+        // Draw username signature (from authenticated user)
+        val username = receipt.createdByUserName.ifEmpty { "Admin" }
+        val usernameWidth = signaturePaint.measureText(username)
+        canvas.drawText(username, (PAGE_WIDTH - usernameWidth) / 2, y, signaturePaint)
+        y += 12f
         
         // Trust name (centered, small)
         val trustPaint = createTextPaint(8f)

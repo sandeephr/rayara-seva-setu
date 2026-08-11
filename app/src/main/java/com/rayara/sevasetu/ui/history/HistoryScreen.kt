@@ -89,8 +89,7 @@ fun HistoryScreen(
                 EmptyState()
             } else {
                 ReceiptList(
-                    receipts = uiState.receipts,
-                    onDeleteReceipt = viewModel::deleteReceipt
+                    receipts = uiState.receipts
                 )
             }
         }
@@ -174,8 +173,7 @@ fun TodaySummaryCard(
 
 @Composable
 fun ReceiptList(
-    receipts: List<Receipt>,
-    onDeleteReceipt: (Receipt) -> Unit
+    receipts: List<Receipt>
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -184,8 +182,7 @@ fun ReceiptList(
     ) {
         items(receipts, key = { it.id }) { receipt ->
             ReceiptItem(
-                receipt = receipt,
-                onDelete = { onDeleteReceipt(receipt) }
+                receipt = receipt
             )
         }
     }
@@ -193,11 +190,9 @@ fun ReceiptList(
 
 @Composable
 fun ReceiptItem(
-    receipt: Receipt,
-    onDelete: () -> Unit
+    receipt: Receipt
 ) {
     val context = LocalContext.current
-    var showDeleteDialog by remember { mutableStateOf(false) }
     
     Card(
         modifier = Modifier
@@ -269,11 +264,32 @@ fun ReceiptItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                
+                // Show creator username if available
+                if (receipt.createdByUserName.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "ರಚಿಸಿದವರು: ${receipt.createdByUserName}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
             
             Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalAlignment = Alignment.End
             ) {
                 Text(
                     text = receipt.getFormattedAmount(),
@@ -281,42 +297,8 @@ fun ReceiptItem(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                
-                IconButton(
-                    onClick = { showDeleteDialog = true },
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "ಅಳಿಸಿ",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
             }
         }
-    }
-    
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("ರಶೀದಿ ಅಳಿಸಿ?") },
-            text = { Text("ಈ ರಶೀದಿಯನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDelete()
-                        showDeleteDialog = false
-                    }
-                ) {
-                    Text("ಅಳಿಸಿ", color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("ರದ್ದುಮಾಡಿ")
-                }
-            }
-        )
     }
 }
 

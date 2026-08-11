@@ -1,13 +1,16 @@
 package com.rayara.sevasetu.ui.billing
 
 import android.app.Application
+import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.rayara.sevasetu.data.database.AppDatabase
 import com.rayara.sevasetu.data.database.entities.Receipt
 import com.rayara.sevasetu.data.models.PaymentMode
 import com.rayara.sevasetu.data.repository.ReceiptRepository
+import com.rayara.sevasetu.sync.FirestoreSync
 import com.rayara.sevasetu.utils.Constants
+import com.rayara.sevasetu.utils.NetworkUtils
 import com.rayara.sevasetu.utils.PDFGenerator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,9 +36,16 @@ data class BillingUiState(
 
 class BillingViewModel(application: Application) : AndroidViewModel(application) {
     
+    private val context = application.applicationContext
     private val database = AppDatabase.getDatabase(application)
     private val repository = ReceiptRepository(database.receiptDao())
+    private val userDao = database.userDao()
     private val pdfGenerator = PDFGenerator(application)
+    private val firestoreSync = FirestoreSync(application)
+    
+    private val deviceId: String by lazy {
+        Settings.Secure.getString(application.contentResolver, Settings.Secure.ANDROID_ID)
+    }
     
     private val _uiState = MutableStateFlow(BillingUiState())
     val uiState: StateFlow<BillingUiState> = _uiState.asStateFlow()
@@ -104,6 +114,12 @@ class BillingViewModel(application: Application) : AndroidViewModel(application)
                     state.customerPhone.trim()
                 }
                 
+                // Get current user
+                val currentUser = userDao.getCurrentUser()
+                
+                // Check network status
+                val isOnline = NetworkUtils.isNetworkAvailable(context)
+                
                 val receipt = Receipt(
                     receiptNumber = receiptNumber,
                     customerName = finalCustomerName,
@@ -112,7 +128,13 @@ class BillingViewModel(application: Application) : AndroidViewModel(application)
                     serviceDescription = "${Constants.Receipt.SERVICE_LABEL}",
                     paymentMode = state.paymentMode!!.name,
                     date = currentDate,
-                    time = currentTime
+                    time = currentTime,
+                    createdByUserId = currentUser?.userId ?: "",
+                    createdByUserName = currentUser?.name ?: "",
+                    createdByMobile = currentUser?.mobileNumber ?: "",
+                    deviceId = deviceId,
+                    isOfflineEntry = !isOnline,
+                    syncedToServer = false
                 )
                 
                 val receiptId = repository.insertReceipt(receipt)
@@ -123,6 +145,13 @@ class BillingViewModel(application: Application) : AndroidViewModel(application)
                     
                     val updatedReceipt = savedReceipt.copy(pdfPath = pdfFile.absolutePath)
                     repository.updateReceipt(updatedReceipt)
+                    
+                    // Sync to Firestore in background if online (don't block UI)
+                    if (isOnline) {
+                        viewModelScope.launch {
+                            firestoreSync.syncReceiptToFirestore(updatedReceipt)
+                        }
+                    }
                     
                     // Clear form data but keep preview dialog open
                     _uiState.value = BillingUiState(

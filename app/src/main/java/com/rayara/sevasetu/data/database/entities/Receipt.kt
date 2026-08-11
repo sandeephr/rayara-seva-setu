@@ -29,7 +29,21 @@ data class Receipt(
     
     val pdfPath: String? = null,
     
-    val isDeleted: Boolean = false
+    val isDeleted: Boolean = false,
+    
+    // User tracking
+    val createdByUserId: String = "",
+    
+    val createdByUserName: String = "",
+    
+    val createdByMobile: String = "",
+    
+    // Sync tracking
+    val syncedToServer: Boolean = false,
+    
+    val isOfflineEntry: Boolean = false,
+    
+    val deviceId: String = ""
 ) {
     fun getPaymentModeEnum(): PaymentMode {
         return PaymentMode.fromString(paymentMode)

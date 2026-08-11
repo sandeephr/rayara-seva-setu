@@ -16,7 +16,14 @@ interface ReceiptDao {
     @Delete
     suspend fun deleteReceipt(receipt: Receipt)
     
-    @Query("SELECT * FROM receipts WHERE isDeleted = 0 ORDER BY timestamp DESC")
+    @Query("""
+        SELECT * FROM receipts 
+        WHERE isDeleted = 0 
+        ORDER BY 
+            timestamp DESC,
+            CASE WHEN isOfflineEntry = 0 THEN 0 ELSE 1 END,
+            receiptNumber DESC
+    """)
     fun getAllReceipts(): Flow<List<Receipt>>
     
     @Query("SELECT * FROM receipts WHERE id = :id AND isDeleted = 0")
@@ -82,4 +89,10 @@ interface ReceiptDao {
         ORDER BY timestamp DESC
     """)
     suspend fun getReceiptsByDateRange(startDate: String, endDate: String): List<Receipt>
+    
+    @Query("SELECT * FROM receipts WHERE syncedToServer = 0 AND isDeleted = 0")
+    suspend fun getUnsyncedReceipts(): List<Receipt>
+    
+    @Query("DELETE FROM receipts")
+    suspend fun deleteAllReceipts()
 }
