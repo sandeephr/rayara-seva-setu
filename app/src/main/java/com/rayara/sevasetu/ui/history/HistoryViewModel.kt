@@ -31,15 +31,9 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
     private val firestoreSync = FirestoreSync(application)
     
     init {
-        // Sync receipts from Firestore on startup
-        viewModelScope.launch {
-            try {
-                firestoreSync.performFullSync()
-                Log.d("HistoryViewModel", "Initial sync completed")
-            } catch (e: Exception) {
-                Log.e("HistoryViewModel", "Initial sync failed", e)
-            }
-        }
+        // Don't auto-sync on init to prevent pulling back deleted receipts
+        // Sync will happen when user explicitly creates/edits receipts
+        Log.d("HistoryViewModel", "HistoryViewModel initialized (auto-sync disabled)")
     }
     
     private val _searchQuery = MutableStateFlow("")

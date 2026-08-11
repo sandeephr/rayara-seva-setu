@@ -342,6 +342,10 @@ fun SettingsScreen(
                                 database.receiptDao().deleteAllReceipts()
                                 android.util.Log.d("SettingsScreen", "Local database cleared")
                                 
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    Toast.makeText(context, "ಸ್ಥಳೀಯ ಡೇಟಾ ಅಳಿಸಲಾಗಿದೆ", Toast.LENGTH_SHORT).show()
+                                }
+                                
                                 // Small delay to ensure database operation completes
                                 kotlinx.coroutines.delay(300)
                                 
@@ -351,22 +355,39 @@ fun SettingsScreen(
                                 
                                 // Delete from Firestore and WAIT for completion
                                 var firestoreSuccess = false
+                                var firestoreError: String? = null
                                 try {
                                     android.util.Log.d("SettingsScreen", "Starting Firestore deletion...")
+                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                        Toast.makeText(context, "Firestore ಅಳಿಸಲಾಗುತ್ತಿದೆ...", Toast.LENGTH_SHORT).show()
+                                    }
+                                    
                                     firestoreSuccess = firestoreSync.deleteAllReceiptsFromFirestore()
                                     android.util.Log.d("SettingsScreen", "Firestore deletion completed: $firestoreSuccess")
+                                    
+                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                        Toast.makeText(
+                                            context, 
+                                            if (firestoreSuccess) "Firestore ಅಳಿಸಲಾಗಿದೆ ✓" else "Firestore ವಿಫಲವಾಗಿದೆ",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                     
                                     // Extra delay to ensure Firestore changes propagate
                                     kotlinx.coroutines.delay(500)
                                 } catch (e: Exception) {
                                     // Firestore deletion failed (likely offline)
-                                    android.util.Log.e("SettingsScreen", "Firestore deletion failed", e)
+                                    firestoreError = e.message
+                                    android.util.Log.e("SettingsScreen", "Firestore deletion failed: ${e.message}", e)
+                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                        Toast.makeText(context, "Firestore ದೋಷ: ${e.message}", Toast.LENGTH_LONG).show()
+                                    }
                                 }
                                 
                                 val message = if (firestoreSuccess) {
-                                    "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ"
+                                    "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ ✓"
                                 } else {
-                                    "ಸ್ಥಳೀಯವಾಗಿ ಅಳಿಸಲಾಗಿದೆ. ಆನ್‌ಲೈನ್ ಆದಾಗ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
+                                    "⚠️ ಸ್ಥಳೀಯವಾಗಿ ಅಳಿಸಲಾಗಿದೆ. Firestore ವಿಫಲ: ${firestoreError ?: "ಆನ್‌ಲೈನ್ ಇಲ್ಲ"}"
                                 }
                                 
                                 Toast.makeText(

@@ -141,24 +141,40 @@ class FirestoreSync(private val context: Context) {
     // Delete all receipts from Firestore
     suspend fun deleteAllReceiptsFromFirestore(): Boolean {
         return try {
+            Log.d(TAG, "Fetching all receipts from Firestore for deletion...")
             val snapshot = firestore.collection(RECEIPTS_COLLECTION)
                 .get()
                 .await()
             
+            val totalCount = snapshot.documents.size
+            Log.d(TAG, "Found $totalCount receipts to delete")
+            
+            if (totalCount == 0) {
+                Log.d(TAG, "No receipts to delete")
+                return true // Nothing to delete is success
+            }
+            
             var deletedCount = 0
+            var failedCount = 0
+            
             for (document in snapshot.documents) {
                 try {
+                    Log.d(TAG, "Deleting receipt ${document.id}...")
                     document.reference.delete().await()
                     deletedCount++
+                    Log.d(TAG, "Successfully deleted receipt ${document.id}")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to delete receipt ${document.id}", e)
+                    failedCount++
+                    Log.e(TAG, "Failed to delete receipt ${document.id}: ${e.message}", e)
                 }
             }
             
-            Log.d(TAG, "Deleted $deletedCount receipts from Firestore")
-            true
+            Log.d(TAG, "Deletion complete: $deletedCount deleted, $failedCount failed out of $totalCount total")
+            
+            // Return true only if ALL receipts were deleted
+            deletedCount == totalCount
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to delete all receipts from Firestore", e)
+            Log.e(TAG, "Failed to fetch receipts from Firestore: ${e.message}", e)
             false
         }
     }
