@@ -245,7 +245,16 @@ class PDFGenerator(private val context: Context) {
         // Customer phone
         val phoneText = "${Constants.Receipt.PHONE_PREFIX} ${receipt.customerPhone}"
         canvas.drawText(phoneText, MARGIN, y, regularPaint)
-        y += NORMAL_SIZE + 10f
+        y += NORMAL_SIZE + 5f
+        
+        // Created by (if available)
+        if (receipt.createdByUserName.isNotEmpty()) {
+            val createdByText = "ರಚಿಸಿದವರು: ${receipt.createdByUserName}"
+            canvas.drawText(createdByText, MARGIN, y, regularPaint)
+            y += NORMAL_SIZE + 10f
+        } else {
+            y += 10f
+        }
         
         // Decorative double line
         val linePaint = Paint().apply {
@@ -370,10 +379,18 @@ class PDFGenerator(private val context: Context) {
         }
         
         // Draw username signature (from authenticated user)
-        val username = receipt.createdByUserName.ifEmpty { "Admin" }
-        val usernameWidth = signaturePaint.measureText(username)
-        canvas.drawText(username, (PAGE_WIDTH - usernameWidth) / 2, y, signaturePaint)
-        y += 12f
+        if (receipt.createdByUserName.isNotEmpty()) {
+            val username = receipt.createdByUserName
+            val usernameWidth = signaturePaint.measureText(username)
+            canvas.drawText(username, (PAGE_WIDTH - usernameWidth) / 2, y, signaturePaint)
+            y += 12f
+        } else {
+            // Show placeholder if no creator name
+            val placeholder = "(ಸಹಿ)"
+            val placeholderWidth = signaturePaint.measureText(placeholder)
+            canvas.drawText(placeholder, (PAGE_WIDTH - placeholderWidth) / 2, y, signaturePaint)
+            y += 12f
+        }
         
         // Trust name (centered, small)
         val trustPaint = createTextPaint(8f)

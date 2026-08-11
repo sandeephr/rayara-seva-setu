@@ -322,6 +322,11 @@ fun SettingsScreen(
                         scope.launch {
                             database.receiptDao().deleteAllReceipts()
                             showClearDialog = false
+                            Toast.makeText(
+                                context,
+                                "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     colors = ButtonDefaults.textButtonColors(
