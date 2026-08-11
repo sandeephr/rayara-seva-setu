@@ -318,11 +318,7 @@ class PDFGenerator(private val context: Context) {
         val blessing = "🌺 ಶ್ರೀ ರಾಘವೇಂದ್ರ ಸ್ವಾಮಿಗಳವರ ಅನುಗ್ರಹ ಸದಾ ಇರಲಿ 🌺"
         val blessingWidth = blessingPaint.measureText(blessing)
         canvas.drawText(blessing, (PAGE_WIDTH - blessingWidth) / 2, y, blessingPaint)
-        y += 9f + 8f
-        
-        // Decorative line before signature
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 10f
+        y += 9f + 15f
         
         // Username signature (centered, handwriting font, 10sp)
         val signaturePaint = TextPaint().apply {
