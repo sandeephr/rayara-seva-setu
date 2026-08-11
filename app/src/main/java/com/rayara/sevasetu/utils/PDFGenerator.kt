@@ -107,27 +107,16 @@ class PDFGenerator(private val context: Context) {
     private fun drawHeader(canvas: Canvas, startY: Float): Float {
         var y = startY
         
-        // Om symbol (centered)
-        val omPaint = createTextPaint(18f, bold = true)
-        omPaint.color = getColor(
+        // Header mantra (centered)
+        val headerPaint = createTextPaint(11f, bold = true)
+        headerPaint.color = getColor(
             android.graphics.Color.rgb(139, 0, 0),  // Dark red (color)
             android.graphics.Color.BLACK  // Black (B&W)
         )
-        val om = "ॐ"
-        val omWidth = omPaint.measureText(om)
-        canvas.drawText(om, (PAGE_WIDTH - omWidth) / 2, y, omPaint)
-        y += 18f + 8f
-        
-        // Guru mantra (centered)
-        val mantraPaint = createTextPaint(10f)
-        mantraPaint.color = getColor(
-            android.graphics.Color.rgb(101, 67, 33),  // Dark brown (color)
-            android.graphics.Color.BLACK  // Black (B&W)
-        )
-        val mantra = "ಶ್ರೀ ಗುರುಭ್ಯೋ ನಮః"
-        val mantraWidth = mantraPaint.measureText(mantra)
-        canvas.drawText(mantra, (PAGE_WIDTH - mantraWidth) / 2, y, mantraPaint)
-        y += 10f + 5f
+        val header = Constants.Organization.HEADER
+        val headerWidth = headerPaint.measureText(header)
+        canvas.drawText(header, (PAGE_WIDTH - headerWidth) / 2, y, headerPaint)
+        y += 11f + 8f
         
         // Organization name (centered, bold, smaller size to fit)
         val titlePaint = createTextPaint(11f, bold = true)

@@ -3,8 +3,9 @@ package com.rayara.sevasetu.utils
 object Constants {
     
     object Organization {
-        const val NAME = "ಶ್ರೀ ರಾಘವೇಂದ್ರಸ್ವಾಮಿಗಳ ಬ್ರಂದಾವನ"
-        const val ADDRESS = "ಬ್ರಾಹ್ಮಣರ ಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ"
+        const val HEADER = "|| ಶ್ರೀ ಗುರುರಾಜೋ ವಿಜಯತೇ ||"
+        const val NAME = "ಶ್ರೀ ರಾಘವೇಂದ್ರಸ್ವಾಮಿಗಳ ಬೃಂದಾವನ"
+        const val ADDRESS = "ಬ್ರಾಹ್ಮಣರಬೀದಿ, ದೊಡ್ಡಬಳ್ಳಾಪುರ"
         const val TRUST = "ಶ್ರೀ ರಾಘವೇಂದ್ರ ಗುರುಸಾರ್ವಭೌಮ ಸೇವಾ ಟ್ರಸ್ಟ್ (ರಿ.)"
     }
     

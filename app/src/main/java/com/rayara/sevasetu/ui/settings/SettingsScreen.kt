@@ -322,15 +322,12 @@ fun SettingsScreen(
                     onClick = {
                         scope.launch {
                             database.receiptDao().deleteAllReceipts()
-                            showClearDialog = false
                             Toast.makeText(
                                 context,
                                 "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ",
-                                Toast.LENGTH_SHORT
+                                Toast.LENGTH_LONG
                             ).show()
-                            // Navigate back to force UI refresh
-                            kotlinx.coroutines.delay(500)
-                            onNavigateBack()
+                            showClearDialog = false
                         }
                     },
                     colors = ButtonDefaults.textButtonColors(

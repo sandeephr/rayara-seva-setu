@@ -103,21 +103,13 @@ fun RayaraSevaSetuApp() {
     
     var isCheckingAuth by remember { mutableStateOf(true) }
     var isLoggedIn by remember { mutableStateOf(false) }
-    var logoutTrigger by remember { mutableStateOf(0) }
     
-    // Check if user is logged in (re-check on logout)
-    LaunchedEffect(logoutTrigger) {
+    // Check if user is logged in
+    LaunchedEffect(Unit) {
         scope.launch {
             val authManager = AuthManager(context)
             isLoggedIn = authManager.isUserLoggedIn()
             isCheckingAuth = false
-            
-            // Navigate to login if logged out
-            if (!isLoggedIn && logoutTrigger > 0) {
-                navController.navigate("login") {
-                    popUpTo(0) { inclusive = true }
-                }
-            }
         }
     }
     
@@ -177,10 +169,11 @@ fun RayaraSevaSetuApp() {
                     navController.popBackStack()
                 },
                 onLogout = {
-                    // Trigger re-authentication check
+                    // Navigate to login and clear back stack
                     // (SettingsScreen already called authManager.logout())
-                    isCheckingAuth = true
-                    logoutTrigger++
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }
