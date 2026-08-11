@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -49,10 +50,18 @@ class MainActivity : ComponentActivity() {
         scheduleSessionCheck()
         
         // Register broadcast receiver for force logout
-        registerReceiver(
-            forceLogoutReceiver,
-            IntentFilter("com.rayara.sevasetu.FORCE_LOGOUT")
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                forceLogoutReceiver,
+                IntentFilter("com.rayara.sevasetu.FORCE_LOGOUT"),
+                Context.RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            registerReceiver(
+                forceLogoutReceiver,
+                IntentFilter("com.rayara.sevasetu.FORCE_LOGOUT")
+            )
+        }
         
         setContent {
             RayaraSevaSetuTheme {
