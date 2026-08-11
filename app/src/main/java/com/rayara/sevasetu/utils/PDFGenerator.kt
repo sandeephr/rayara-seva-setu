@@ -93,7 +93,7 @@ class PDFGenerator(private val context: Context) {
         yPosition += 10f
         
         // Draw footer
-        drawFooter(canvas, yPosition)
+        drawFooter(canvas, yPosition, receipt)
         
         pdfDocument.finishPage(page)
         
@@ -329,7 +329,7 @@ class PDFGenerator(private val context: Context) {
         return y
     }
     
-    private fun drawFooter(canvas: Canvas, startY: Float) {
+    private fun drawFooter(canvas: Canvas, startY: Float, receipt: Receipt) {
         var y = startY + 15f
         
         // Decorative line
