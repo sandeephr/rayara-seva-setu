@@ -40,6 +40,16 @@ class AuthViewModel : ViewModel() {
         }
     }
     
+    fun resetAuthState() {
+        _uiState.value = AuthUiState()
+    }
+    
+    fun recheckAuth() {
+        if (::authManager.isInitialized) {
+            checkIfLoggedIn()
+        }
+    }
+    
     fun updateName(name: String) {
         _uiState.value = _uiState.value.copy(name = name, errorMessage = null)
     }

@@ -40,6 +40,7 @@ fun SettingsScreen(
     var currentUser by remember { mutableStateOf<com.rayara.sevasetu.data.database.entities.User?>(null) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showClearDialog by remember { mutableStateOf(false) }
+    var isClearingData by remember { mutableStateOf(false) }
     
     // Load current user
     LaunchedEffect(Unit) {
@@ -330,37 +331,76 @@ fun SettingsScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
+                        isClearingData = true
                         scope.launch {
-                            // Delete from local database
-                            database.receiptDao().deleteAllReceipts()
-                            
-                            // Delete from Firestore
-                            var firestoreSuccess = false
                             try {
-                                firestoreSuccess = firestoreSync.deleteAllReceiptsFromFirestore()
+                                // Check count before deletion
+                                val countBefore = database.receiptDao().getUnsyncedReceipts().size
+                                android.util.Log.d("SettingsScreen", "Receipts before deletion: $countBefore")
+                                
+                                // Delete from local database FIRST
+                                database.receiptDao().deleteAllReceipts()
+                                android.util.Log.d("SettingsScreen", "Local database cleared")
+                                
+                                // Small delay to ensure database operation completes
+                                kotlinx.coroutines.delay(300)
+                                
+                                // Verify deletion
+                                val countAfter = database.receiptDao().getUnsyncedReceipts().size
+                                android.util.Log.d("SettingsScreen", "Receipts after deletion: $countAfter")
+                                
+                                // Delete from Firestore and WAIT for completion
+                                var firestoreSuccess = false
+                                try {
+                                    android.util.Log.d("SettingsScreen", "Starting Firestore deletion...")
+                                    firestoreSuccess = firestoreSync.deleteAllReceiptsFromFirestore()
+                                    android.util.Log.d("SettingsScreen", "Firestore deletion completed: $firestoreSuccess")
+                                    
+                                    // Extra delay to ensure Firestore changes propagate
+                                    kotlinx.coroutines.delay(500)
+                                } catch (e: Exception) {
+                                    // Firestore deletion failed (likely offline)
+                                    android.util.Log.e("SettingsScreen", "Firestore deletion failed", e)
+                                }
+                                
+                                val message = if (firestoreSuccess) {
+                                    "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ"
+                                } else {
+                                    "ಸ್ಥಳೀಯವಾಗಿ ಅಳಿಸಲಾಗಿದೆ. ಆನ್‌ಲೈನ್ ಆದಾಗ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
+                                }
+                                
+                                Toast.makeText(
+                                    context,
+                                    message,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                
                             } catch (e: Exception) {
-                                // Firestore deletion failed (likely offline)
+                                android.util.Log.e("SettingsScreen", "Clear all failed", e)
+                                Toast.makeText(
+                                    context,
+                                    "ದೋಷ: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            } finally {
+                                isClearingData = false
+                                showClearDialog = false
                             }
-                            
-                            val message = if (firestoreSuccess) {
-                                "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ"
-                            } else {
-                                "ಸ್ಥಳೀಯವಾಗಿ ಅಳಿಸಲಾಗಿದೆ. ಆನ್‌ಲೈನ್ ಆದಾಗ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
-                            }
-                            
-                            Toast.makeText(
-                                context,
-                                message,
-                                Toast.LENGTH_LONG
-                            ).show()
-                            showClearDialog = false
                         }
                     },
+                    enabled = !isClearingData,
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("ಅಳಿಸಿ")
+                    if (isClearingData) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    Text(if (isClearingData) "ಅಳಿಸಲಾಗುತ್ತಿದೆ..." else "ಅಳಿಸಿ")
                 }
             },
             dismissButton = {

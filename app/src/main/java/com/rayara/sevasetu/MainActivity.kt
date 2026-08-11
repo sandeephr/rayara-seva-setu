@@ -169,6 +169,10 @@ fun RayaraSevaSetuApp() {
                     navController.popBackStack()
                 },
                 onLogout = {
+                    // Reset auth state in ViewModel
+                    authViewModel.resetAuthState()
+                    // Update logged in state
+                    isLoggedIn = false
                     // Navigate to login and clear back stack
                     // (SettingsScreen already called authManager.logout())
                     navController.navigate("login") {
