@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1007847440517",
+    "project_id": "rayara-seva-setu",
+    "storage_bucket": "rayara-seva-setu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007847440517:android:47c2e7e9e1458740c4a9ec",
+        "android_client_info": {
+          "package_name": "com.rayara.sevasetu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAErEMi9LOcy6YfsfNkiUH_tl0_wQRja4A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
