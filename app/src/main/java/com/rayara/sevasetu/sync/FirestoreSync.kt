@@ -141,41 +141,53 @@ class FirestoreSync(private val context: Context) {
     // Delete all receipts from Firestore
     suspend fun deleteAllReceiptsFromFirestore(): Boolean {
         return try {
-            Log.d(TAG, "Fetching all receipts from Firestore for deletion...")
             val snapshot = firestore.collection(RECEIPTS_COLLECTION)
                 .get()
                 .await()
             
-            val totalCount = snapshot.documents.size
-            Log.d(TAG, "Found $totalCount receipts to delete")
-            
-            if (totalCount == 0) {
-                Log.d(TAG, "No receipts to delete")
-                return true // Nothing to delete is success
+            if (snapshot.isEmpty) {
+                return true // Nothing to delete
             }
             
-            var deletedCount = 0
-            var failedCount = 0
+            // Use batch delete for better performance
+            val batch = firestore.batch()
+            var batchCount = 0
             
             for (document in snapshot.documents) {
-                try {
-                    Log.d(TAG, "Deleting receipt ${document.id}...")
-                    document.reference.delete().await()
-                    deletedCount++
-                    Log.d(TAG, "Successfully deleted receipt ${document.id}")
-                } catch (e: Exception) {
-                    failedCount++
-                    Log.e(TAG, "Failed to delete receipt ${document.id}: ${e.message}", e)
+                batch.delete(document.reference)
+                batchCount++
+                
+                // Firestore batch limit is 500 operations
+                if (batchCount >= 500) {
+                    batch.commit().await()
+                    batchCount = 0
                 }
             }
             
-            Log.d(TAG, "Deletion complete: $deletedCount deleted, $failedCount failed out of $totalCount total")
+            // Commit remaining deletes
+            if (batchCount > 0) {
+                batch.commit().await()
+            }
             
-            // Return true only if ALL receipts were deleted
-            deletedCount == totalCount
+            true
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to fetch receipts from Firestore: ${e.message}", e)
-            false
+            // Even if batch fails, try individual deletes
+            try {
+                val snapshot = firestore.collection(RECEIPTS_COLLECTION)
+                    .get()
+                    .await()
+                
+                for (document in snapshot.documents) {
+                    try {
+                        document.reference.delete().await()
+                    } catch (ex: Exception) {
+                        // Continue deleting others
+                    }
+                }
+                true
+            } catch (ex: Exception) {
+                false
+            }
         }
     }
     

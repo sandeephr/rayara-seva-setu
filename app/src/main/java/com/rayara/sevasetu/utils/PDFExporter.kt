@@ -103,6 +103,13 @@ class PDFExporter(private val context: Context) {
     private fun drawExportHeader(canvas: Canvas, startDate: String, endDate: String, startY: Float): Float {
         var y = startY
         
+        // Uniform header text (centered, bold) - same as receipt PDF
+        val uniformHeaderPaint = createTextPaint(12f, bold = true)
+        val uniformHeader = Constants.Organization.UNIFORM_HEADER
+        val uniformHeaderWidth = uniformHeaderPaint.measureText(uniformHeader)
+        canvas.drawText(uniformHeader, (PAGE_WIDTH - uniformHeaderWidth) / 2, y, uniformHeaderPaint)
+        y += 12f + 8f
+        
         // Organization name (centered, bold)
         val titlePaint = createTextPaint(TITLE_SIZE, bold = true)
         val orgName = Constants.Organization.NAME
@@ -117,13 +124,13 @@ class PDFExporter(private val context: Context) {
         canvas.drawText(orgAddress, (PAGE_WIDTH - orgAddressWidth) / 2, y, subtitlePaint)
         y += SUBTITLE_SIZE + 10f
         
-        // Divider line
-        val linePaint = Paint().apply {
+        // Thick divider line
+        val thickLinePaint = Paint().apply {
             color = android.graphics.Color.BLACK
-            strokeWidth = 1f
+            strokeWidth = 2f
         }
-        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, linePaint)
-        y += 10f
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, thickLinePaint)
+        y += 15f
         
         // Report title (centered, bold)
         val reportTitlePaint = createTextPaint(14f, bold = true)
@@ -250,19 +257,43 @@ class PDFExporter(private val context: Context) {
             strokeWidth = 1f
         }
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, borderPaint)
-        y += 5f
+        y += 10f  // Increased gap between header and first data row
         
         // Data rows
         val cellPaint = createTextPaint(TABLE_CELL_SIZE)
-        receipts.forEach { receipt ->
+        receipts.forEachIndexed { index, receipt ->
+            // Alternate row background for better readability
+            if (index % 2 == 0) {
+                val lightGrayPaint = Paint().apply {
+                    color = android.graphics.Color.parseColor("#F5F5F5")
+                }
+                canvas.drawRect(MARGIN, y - TABLE_CELL_SIZE, PAGE_WIDTH - MARGIN, y + 3f, lightGrayPaint)
+            }
+            
             canvas.drawText(receipt.receiptNumber.toString(), col1X + 2f, y, cellPaint)
             canvas.drawText(receipt.date, col2X + 2f, y, cellPaint)
-            canvas.drawText(receipt.customerName, col3X + 2f, y, cellPaint)
+            
+            // Truncate long customer names to fit column
+            val customerName = if (receipt.customerName.length > 15) {
+                receipt.customerName.take(13) + ".."
+            } else {
+                receipt.customerName
+            }
+            canvas.drawText(customerName, col3X + 2f, y, cellPaint)
+            
             canvas.drawText(receipt.customerPhone, col4X + 2f, y, cellPaint)
             canvas.drawText(receipt.getFormattedAmount(), col5X + 2f, y, cellPaint)
             canvas.drawText(receipt.getPaymentModeEnum().kannadaName, col6X + 2f, y, cellPaint)
-            canvas.drawText(receipt.createdByUserName, col7X + 2f, y, cellPaint)
-            y += TABLE_CELL_SIZE + 5f
+            
+            // Truncate long user names to fit column
+            val userName = if (receipt.createdByUserName.length > 12) {
+                receipt.createdByUserName.take(10) + ".."
+            } else {
+                receipt.createdByUserName
+            }
+            canvas.drawText(userName, col7X + 2f, y, cellPaint)
+            
+            y += TABLE_CELL_SIZE + 6f  // Slightly increased row spacing
         }
     }
     

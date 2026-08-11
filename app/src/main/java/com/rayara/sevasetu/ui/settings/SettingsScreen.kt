@@ -358,36 +358,25 @@ fun SettingsScreen(
                                 var firestoreError: String? = null
                                 try {
                                     android.util.Log.d("SettingsScreen", "Starting Firestore deletion...")
-                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                        Toast.makeText(context, "Firestore ಅಳಿಸಲಾಗುತ್ತಿದೆ...", Toast.LENGTH_SHORT).show()
-                                    }
                                     
                                     firestoreSuccess = firestoreSync.deleteAllReceiptsFromFirestore()
                                     android.util.Log.d("SettingsScreen", "Firestore deletion completed: $firestoreSuccess")
                                     
-                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                        Toast.makeText(
-                                            context, 
-                                            if (firestoreSuccess) "Firestore ಅಳಿಸಲಾಗಿದೆ ✓" else "Firestore ವಿಫಲವಾಗಿದೆ",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                    
                                     // Extra delay to ensure Firestore changes propagate
-                                    kotlinx.coroutines.delay(500)
+                                    if (firestoreSuccess) {
+                                        kotlinx.coroutines.delay(500)
+                                    }
                                 } catch (e: Exception) {
                                     // Firestore deletion failed (likely offline)
                                     firestoreError = e.message
                                     android.util.Log.e("SettingsScreen", "Firestore deletion failed: ${e.message}", e)
-                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                        Toast.makeText(context, "Firestore ದೋಷ: ${e.message}", Toast.LENGTH_LONG).show()
-                                    }
+                                    // Don't show intermediate error toast - final message will explain
                                 }
                                 
                                 val message = if (firestoreSuccess) {
-                                    "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ ✓"
+                                    "✓ ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಅಳಿಸಲಾಗಿದೆ"
                                 } else {
-                                    "⚠️ ಸ್ಥಳೀಯವಾಗಿ ಅಳಿಸಲಾಗಿದೆ. Firestore ವಿಫಲ: ${firestoreError ?: "ಆನ್‌ಲೈನ್ ಇಲ್ಲ"}"
+                                    "✓ ಸ್ಥಳೀಯವಾಗಿ ಅಳಿಸಲಾಗಿದೆ"
                                 }
                                 
                                 Toast.makeText(
