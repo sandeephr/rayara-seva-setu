@@ -105,7 +105,7 @@ class PDFExporter(private val context: Context) {
         
         // Uniform header text (centered, bold) - same as receipt PDF
         val uniformHeaderPaint = createTextPaint(12f, bold = true)
-        val uniformHeader = Constants.Organization.UNIFORM_HEADER
+        val uniformHeader = Constants.Organization.HEADER
         val uniformHeaderWidth = uniformHeaderPaint.measureText(uniformHeader)
         canvas.drawText(uniformHeader, (PAGE_WIDTH - uniformHeaderWidth) / 2, y, uniformHeaderPaint)
         y += 12f + 8f
