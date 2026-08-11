@@ -97,6 +97,7 @@ class MainActivity : ComponentActivity() {
 fun RayaraSevaSetuApp() {
     val navController = rememberNavController()
     val context = LocalContext.current
+    val activity = context as? ComponentActivity
     val authViewModel: AuthViewModel = viewModel()
     val scope = rememberCoroutineScope()
     
@@ -163,13 +164,13 @@ fun RayaraSevaSetuApp() {
         }
         
         composable("settings") {
-            val activity = context as? ComponentActivity
             SettingsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onLogout = {
                     // Restart activity to force fresh auth check
+                    // (SettingsScreen already called authManager.logout())
                     activity?.recreate()
                 }
             )
