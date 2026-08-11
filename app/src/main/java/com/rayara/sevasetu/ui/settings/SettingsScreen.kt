@@ -33,6 +33,7 @@ fun SettingsScreen(
     val prefsManager = remember { PreferencesManager(context) }
     val authManager = remember { AuthManager(context) }
     val database = remember { AppDatabase.getDatabase(context) }
+    val firestoreSync = remember { com.rayara.sevasetu.sync.FirestoreSync(context) }
     val scope = rememberCoroutineScope()
     
     var selectedMode by remember { mutableStateOf(prefsManager.receiptColorMode) }
@@ -289,9 +290,18 @@ fun SettingsScreen(
                 TextButton(
                     onClick = {
                         scope.launch {
-                            authManager.logout()
                             showLogoutDialog = false
-                            onLogout()
+                            try {
+                                authManager.logout()
+                                // Small delay to ensure database operations complete
+                                kotlinx.coroutines.delay(500)
+                            } catch (e: Exception) {
+                                // Ignore errors, still logout
+                            }
+                            // Navigate to login on main thread
+                            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                onLogout()
+                            }
                         }
                     }
                 ) {
@@ -321,10 +331,26 @@ fun SettingsScreen(
                 TextButton(
                     onClick = {
                         scope.launch {
+                            // Delete from local database
                             database.receiptDao().deleteAllReceipts()
+                            
+                            // Delete from Firestore
+                            var firestoreSuccess = false
+                            try {
+                                firestoreSuccess = firestoreSync.deleteAllReceiptsFromFirestore()
+                            } catch (e: Exception) {
+                                // Firestore deletion failed (likely offline)
+                            }
+                            
+                            val message = if (firestoreSuccess) {
+                                "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ"
+                            } else {
+                                "ಸ್ಥಳೀಯವಾಗಿ ಅಳಿಸಲಾಗಿದೆ. ಆನ್‌ಲೈನ್ ಆದಾಗ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
+                            }
+                            
                             Toast.makeText(
                                 context,
-                                "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ",
+                                message,
                                 Toast.LENGTH_LONG
                             ).show()
                             showClearDialog = false

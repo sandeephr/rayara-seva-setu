@@ -138,6 +138,31 @@ class FirestoreSync(private val context: Context) {
         }
     }
     
+    // Delete all receipts from Firestore
+    suspend fun deleteAllReceiptsFromFirestore(): Boolean {
+        return try {
+            val snapshot = firestore.collection(RECEIPTS_COLLECTION)
+                .get()
+                .await()
+            
+            var deletedCount = 0
+            for (document in snapshot.documents) {
+                try {
+                    document.reference.delete().await()
+                    deletedCount++
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to delete receipt ${document.id}", e)
+                }
+            }
+            
+            Log.d(TAG, "Deleted $deletedCount receipts from Firestore")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete all receipts from Firestore", e)
+            false
+        }
+    }
+    
     // Full bidirectional sync
     suspend fun performFullSync(): SyncResult {
         return try {
