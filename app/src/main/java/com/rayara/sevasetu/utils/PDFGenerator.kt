@@ -345,18 +345,11 @@ class PDFGenerator(private val context: Context) {
         canvas.drawText(blessing, (PAGE_WIDTH - blessingWidth) / 2, y, blessingPaint)
         y += 9f + 8f
         
-        // Temple seal placeholder (centered, small)
-        val sealPaint = createTextPaint(8f)
-        val seal = "[ ದೇವಾಲಯದ ಮುದ್ರೆ ]"
-        val sealWidth = sealPaint.measureText(seal)
-        canvas.drawText(seal, (PAGE_WIDTH - sealWidth) / 2, y, sealPaint)
-        y += 8f + 5f
-        
-        // Authorized signature (centered, small)
-        val sigPaint = createTextPaint(8f)
-        val sig = "ಅಧಿಕೃತ ಸಹಿ"
-        val sigWidth = sigPaint.measureText(sig)
-        canvas.drawText(sig, (PAGE_WIDTH - sigWidth) / 2, y, sigPaint)
+        // Trust name (centered, small)
+        val trustPaint = createTextPaint(8f)
+        val trustName = "ಶ್ರೀ ರಾಘವೇಂದ್ರ ಗುರುಸಾರ್ವಭೌಮ ಸೇವಾ ಟ್ರಸ್ಟ್ (ರಿ.)"
+        val trustWidth = trustPaint.measureText(trustName)
+        canvas.drawText(trustName, (PAGE_WIDTH - trustWidth) / 2, y, trustPaint)
         y += 8f + 10f
         
         // Decorative line
