@@ -60,36 +60,65 @@ class FirestoreSync(private val context: Context) {
     // Fetch all receipts from Firestore and merge with local
     suspend fun syncReceiptsFromFirestore(): Int {
         return try {
+            Log.d(TAG, "Starting sync from Firestore...")
+            
+            // Don't use orderBy to avoid index requirements
             val snapshot = firestore.collection(RECEIPTS_COLLECTION)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .await()
             
+            Log.d(TAG, "Found ${snapshot.documents.size} documents in Firestore")
+            
             var syncedCount = 0
+            var skippedCount = 0
+            var errorCount = 0
             
             for (document in snapshot.documents) {
                 try {
-                    val id = document.getLong("id") ?: continue
-                    val receiptNumber = document.getString("receiptNumber") ?: continue
+                    Log.d(TAG, "Processing document: ${document.id}")
+                    
+                    val id = document.getLong("id")
+                    if (id == null) {
+                        Log.w(TAG, "Document ${document.id} missing 'id' field, skipping")
+                        errorCount++
+                        continue
+                    }
+                    
+                    val receiptNumber = document.getString("receiptNumber")
+                    if (receiptNumber == null) {
+                        Log.w(TAG, "Document ${document.id} missing 'receiptNumber' field, skipping")
+                        errorCount++
+                        continue
+                    }
                     
                     // Check if receipt already exists locally
                     val existingReceipt = receiptDao.getReceiptById(id)
                     if (existingReceipt != null) {
-                        continue // Skip if already exists
+                        Log.d(TAG, "Receipt $id already exists locally, skipping")
+                        skippedCount++
+                        continue
                     }
                     
                     // Create receipt from Firestore data
+                    val timestamp = document.getLong("timestamp") ?: System.currentTimeMillis()
+                    val date = document.getString("date") ?: ""
+                    val time = document.getString("time") ?: run {
+                        // Generate time from timestamp if missing
+                        val timeFormat = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
+                        timeFormat.format(java.util.Date(timestamp))
+                    }
+                    
                     val receipt = Receipt(
                         id = id,
                         receiptNumber = receiptNumber,
                         customerName = document.getString("customerName") ?: "",
                         customerPhone = document.getString("customerPhone") ?: "",
                         amount = document.getDouble("amount") ?: 0.0,
-                        serviceDescription = document.getString("serviceDescription") ?: "",
-                        paymentMode = document.getString("paymentMode") ?: "CASH",
-                        timestamp = document.getLong("timestamp") ?: System.currentTimeMillis(),
-                        date = document.getString("date") ?: "",
-                        time = document.getString("time") ?: "",
+                        serviceDescription = document.getString("serviceDescription") ?: "ಸೇವೆ",
+                        paymentMode = document.getString("paymentMode") ?: "UPI",
+                        timestamp = timestamp,
+                        date = date,
+                        time = time,
                         pdfPath = null, // PDF is device-specific
                         isDeleted = false,
                         createdByUserId = document.getString("createdByUserId") ?: "",
@@ -101,14 +130,16 @@ class FirestoreSync(private val context: Context) {
                     )
                     
                     receiptDao.insertReceipt(receipt)
+                    Log.d(TAG, "Synced receipt $id ($receiptNumber)")
                     syncedCount++
                     
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to parse receipt from Firestore", e)
+                    Log.e(TAG, "Failed to parse receipt from document ${document.id}", e)
+                    errorCount++
                 }
             }
             
-            Log.d(TAG, "Synced $syncedCount receipts from Firestore")
+            Log.d(TAG, "Sync complete: $syncedCount synced, $skippedCount skipped, $errorCount errors")
             syncedCount
             
         } catch (e: Exception) {

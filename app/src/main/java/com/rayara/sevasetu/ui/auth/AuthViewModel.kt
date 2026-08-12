@@ -278,10 +278,13 @@ class AuthViewModel : ViewModel() {
                     // Sync receipts from Firestore after successful login
                     viewModelScope.launch {
                         try {
+                            android.util.Log.d("AuthViewModel", "Starting receipt sync after login...")
                             val firestoreSync = com.rayara.sevasetu.sync.FirestoreSync(context)
-                            firestoreSync.syncReceiptsFromFirestore()
+                            val syncedCount = firestoreSync.syncReceiptsFromFirestore()
+                            android.util.Log.d("AuthViewModel", "Receipt sync completed: $syncedCount receipts synced")
                         } catch (e: Exception) {
-                            // Ignore sync errors, user can still use the app
+                            android.util.Log.e("AuthViewModel", "Receipt sync failed", e)
+                            // Don't block login if sync fails
                         }
                     }
                     
