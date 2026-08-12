@@ -71,7 +71,25 @@ class AuthManager(private val context: Context) {
         }
     }
     
-    // Send OTP
+    // Validate credentials (password + whitelist check)
+    fun validateCredentials(
+        phoneNumber: String,
+        password: String
+    ): ValidationResult {
+        // Check password
+        if (!AuthConfig.isPasswordValid(password)) {
+            return ValidationResult.InvalidPassword
+        }
+        
+        // Check if phone is in whitelist
+        if (!AuthConfig.isPhoneAllowed(phoneNumber)) {
+            return ValidationResult.PhoneNotAllowed
+        }
+        
+        return ValidationResult.Valid
+    }
+    
+    // Send OTP (kept for backward compatibility, but now uses test phone auth)
     fun sendOTP(
         phoneNumber: String,
         onCodeSent: (verificationId: String) -> Unit,
@@ -99,6 +117,81 @@ class AuthManager(private val context: Context) {
             .build()
         
         PhoneAuthProvider.verifyPhoneNumber(options)
+    }
+    
+    // Direct login with password (new hybrid method)
+    suspend fun loginWithPassword(
+        name: String,
+        phoneNumber: String,
+        password: String,
+        onSuccess: (User) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        try {
+            // Validate credentials
+            val validation = validateCredentials(phoneNumber, password)
+            if (validation != ValidationResult.Valid) {
+                throw Exception(validation.message)
+            }
+            
+            // Use Firebase test phone authentication
+            val credential = PhoneAuthProvider.getCredential(
+                phoneNumber,
+                AuthConfig.DEFAULT_PASSWORD
+            )
+            val result = auth.signInWithCredential(credential).await()
+            val firebaseUser = result.user ?: throw Exception("Firebase authentication failed")
+            
+            // Check if user exists (login) or new user (register)
+            val existingUser = userDao.getUserByMobile(phoneNumber)
+            
+            if (existingUser != null) {
+                // Existing user - login
+                checkAndForceLogout(existingUser.userId)
+                
+                val updatedUser = existingUser.copy(
+                    currentDeviceId = deviceId,
+                    loginToken = UUID.randomUUID().toString(),
+                    lastLoginAt = System.currentTimeMillis()
+                )
+                
+                userDao.insertUser(updatedUser)
+                
+                firestore.collection("users")
+                    .document(existingUser.userId)
+                    .set(updatedUser)
+                    .await()
+                
+                createSession(updatedUser.userId)
+                onSuccess(updatedUser)
+            } else {
+                // New user - register
+                val userId = UUID.randomUUID().toString()
+                val newUser = User(
+                    userId = userId,
+                    name = name,
+                    mobileNumber = phoneNumber,
+                    isVerified = true,
+                    firebaseUid = firebaseUser.uid,
+                    currentDeviceId = deviceId,
+                    loginToken = UUID.randomUUID().toString(),
+                    createdAt = System.currentTimeMillis(),
+                    lastLoginAt = System.currentTimeMillis()
+                )
+                
+                userDao.insertUser(newUser)
+                
+                firestore.collection("users")
+                    .document(userId)
+                    .set(newUser)
+                    .await()
+                
+                createSession(userId)
+                onSuccess(newUser)
+            }
+        } catch (e: Exception) {
+            onFailure(e)
+        }
     }
     
     // Verify OTP and register user
@@ -277,4 +370,13 @@ class AuthManager(private val context: Context) {
         // Sign out from Firebase
         auth.signOut()
     }
+}
+
+/**
+ * Result of credential validation
+ */
+sealed class ValidationResult(val message: String) {
+    object Valid : ValidationResult("Valid credentials")
+    object InvalidPassword : ValidationResult("Invalid password")
+    object PhoneNotAllowed : ValidationResult("This phone number is not authorized to use the app")
 }

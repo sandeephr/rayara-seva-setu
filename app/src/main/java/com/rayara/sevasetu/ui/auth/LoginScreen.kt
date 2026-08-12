@@ -141,131 +141,80 @@ fun LoginScreen(
                         .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (!uiState.showOTPField) {
-                        // Step 1: Name and Mobile Number
-                        Text(
-                            text = "ಲಾಗಿನ್ (Login)",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        
-                        Spacer(modifier = Modifier.height(20.dp))
-                        
-                        OutlinedTextField(
-                            value = uiState.name,
-                            onValueChange = viewModel::updateName,
-                            label = { Text("ಹೆಸರು (Name)") },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !uiState.isLoading,
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        OutlinedTextField(
-                            value = uiState.mobileNumber,
-                            onValueChange = viewModel::updateMobileNumber,
-                            label = { Text("ದೂರವಾಣಿ ಸಂಖ್ಯೆ (Mobile Number)") },
-                            leadingIcon = {
-                                Icon(Icons.Default.Phone, contentDescription = null)
-                            },
-                            prefix = { Text("+91 ") },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !uiState.isLoading,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.height(24.dp))
-                        
-                        Button(
-                            onClick = { viewModel.sendOTP(context) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            enabled = !uiState.isLoading && 
-                                     uiState.name.isNotBlank() && 
-                                     uiState.mobileNumber.length == 10,
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            if (uiState.isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                            } else {
-                                Text(
-                                    text = "OTP ಕಳುಹಿಸಿ (Send OTP)",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    } else {
-                        // Step 2: OTP Verification
-                        Text(
-                            text = "OTP ಪರಿಶೀಲನೆ",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        Text(
-                            text = "OTP ಅನ್ನು +91 ${uiState.mobileNumber} ಗೆ ಕಳುಹಿಸಲಾಗಿದೆ",
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = Color.Gray
-                        )
-                        
-                        Spacer(modifier = Modifier.height(20.dp))
-                        
-                        OutlinedTextField(
-                            value = uiState.otpCode,
-                            onValueChange = viewModel::updateOTPCode,
-                            label = { Text("OTP ನಮೂದಿಸಿ (Enter OTP)") },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !uiState.isLoading,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.height(24.dp))
-                        
-                        Button(
-                            onClick = { viewModel.verifyOTP(context) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            enabled = !uiState.isLoading && uiState.otpCode.length == 6,
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            if (uiState.isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                            } else {
-                                Text(
-                                    text = "ಪರಿಶೀಲಿಸಿ (Verify)",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                        
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        TextButton(
-                            onClick = viewModel::resetOTP,
-                            enabled = !uiState.isLoading
-                        ) {
-                            Text("← ಹಿಂದೆ (Back)")
+                    // Single-step login with password
+                    Text(
+                        text = "ಲಾಗಿನ್ (Login)",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    OutlinedTextField(
+                        value = uiState.name,
+                        onValueChange = viewModel::updateName,
+                        label = { Text("ಹೆಸರು (Name)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !uiState.isLoading,
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    OutlinedTextField(
+                        value = uiState.mobileNumber,
+                        onValueChange = viewModel::updateMobileNumber,
+                        label = { Text("ದೂರವಾಣಿ ಸಂಖ್ಯೆ (Mobile Number)") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Phone, contentDescription = null)
+                        },
+                        prefix = { Text("+91 ") },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !uiState.isLoading,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    OutlinedTextField(
+                        value = uiState.password,
+                        onValueChange = viewModel::updatePassword,
+                        label = { Text("ಪಾಸ್‌ವರ್ಡ್ (Password)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !uiState.isLoading,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Button(
+                        onClick = { viewModel.loginWithPassword(context) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        enabled = !uiState.isLoading && 
+                                 uiState.name.isNotBlank() && 
+                                 uiState.mobileNumber.length == 10 &&
+                                 uiState.password.isNotBlank(),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Text(
+                                text = "ಲಾಗಿನ್ ಮಾಡಿ (Login)",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }

@@ -141,51 +141,73 @@ class FirestoreSync(private val context: Context) {
     // Delete all receipts from Firestore
     suspend fun deleteAllReceiptsFromFirestore(): Boolean {
         return try {
+            Log.d(TAG, "Starting Firestore deletion...")
             val snapshot = firestore.collection(RECEIPTS_COLLECTION)
                 .get()
                 .await()
             
+            Log.d(TAG, "Found ${snapshot.documents.size} documents to delete")
+            
             if (snapshot.isEmpty) {
-                return true // Nothing to delete
+                Log.d(TAG, "No documents to delete")
+                return true
             }
             
             // Use batch delete for better performance
+            Log.d(TAG, "Creating batch delete...")
             val batch = firestore.batch()
             var batchCount = 0
             
             for (document in snapshot.documents) {
                 batch.delete(document.reference)
                 batchCount++
+                Log.d(TAG, "Added document ${document.id} to batch")
                 
                 // Firestore batch limit is 500 operations
                 if (batchCount >= 500) {
+                    Log.d(TAG, "Committing batch of 500...")
                     batch.commit().await()
+                    Log.d(TAG, "Batch committed successfully")
                     batchCount = 0
                 }
             }
             
             // Commit remaining deletes
             if (batchCount > 0) {
+                Log.d(TAG, "Committing final batch of $batchCount documents...")
                 batch.commit().await()
+                Log.d(TAG, "Final batch committed successfully")
             }
             
+            Log.d(TAG, "All Firestore deletions completed successfully")
             true
         } catch (e: Exception) {
+            Log.e(TAG, "Batch delete failed: ${e.message}", e)
             // Even if batch fails, try individual deletes
             try {
+                Log.d(TAG, "Attempting individual deletes as fallback...")
                 val snapshot = firestore.collection(RECEIPTS_COLLECTION)
                     .get()
                     .await()
                 
+                var successCount = 0
+                var failCount = 0
+                
                 for (document in snapshot.documents) {
                     try {
                         document.reference.delete().await()
+                        successCount++
+                        Log.d(TAG, "Deleted document ${document.id}")
                     } catch (ex: Exception) {
-                        // Continue deleting others
+                        failCount++
+                        Log.e(TAG, "Failed to delete document ${document.id}: ${ex.message}")
                     }
                 }
-                true
+                
+                Log.d(TAG, "Individual deletes: $successCount succeeded, $failCount failed")
+                successCount > 0 // Return true if at least one deleted
             } catch (ex: Exception) {
+                Log.e(TAG, "Individual deletes also failed: ${ex.message}", ex)
                 false
             }
         }

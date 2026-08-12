@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 data class AuthUiState(
     val name: String = "",
     val mobileNumber: String = "",
+    val password: String = "",
     val otpCode: String = "",
     val showOTPField: Boolean = false,
     val isLoading: Boolean = false,
@@ -58,6 +59,10 @@ class AuthViewModel : ViewModel() {
         if (number.length <= 10 && number.all { it.isDigit() }) {
             _uiState.value = _uiState.value.copy(mobileNumber = number, errorMessage = null)
         }
+    }
+    
+    fun updatePassword(password: String) {
+        _uiState.value = _uiState.value.copy(password = password, errorMessage = null)
     }
     
     fun updateOTPCode(code: String) {
@@ -197,5 +202,80 @@ class AuthViewModel : ViewModel() {
             verificationId = null,
             errorMessage = null
         )
+    }
+    
+    // New hybrid password-based login
+    fun loginWithPassword(context: Context) {
+        if (!::authManager.isInitialized) {
+            authManager = AuthManager(context)
+        }
+        
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            
+            val name = _uiState.value.name.trim()
+            val mobile = _uiState.value.mobileNumber
+            val password = _uiState.value.password
+            val phoneNumber = "+91$mobile"
+            
+            // Validate inputs
+            if (name.isBlank()) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = "ದಯವಿಟ್ಟು ಹೆಸರು ನಮೂದಿಸಿ (Please enter name)"
+                )
+                return@launch
+            }
+            
+            if (mobile.length != 10) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ (Please enter valid mobile number)"
+                )
+                return@launch
+            }
+            
+            if (password.isBlank()) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = "ದಯವಿಟ್ಟು ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ (Please enter password)"
+                )
+                return@launch
+            }
+            
+            // Check if mobile is already registered (for new users, validate username)
+            val isMobileRegistered = authManager.isMobileRegistered(mobile)
+            
+            if (!isMobileRegistered) {
+                // New user - check username availability
+                val isUsernameAvailable = authManager.isUsernameAvailable(name)
+                if (!isUsernameAvailable) {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = "ಈ ಹೆಸರು ಈಗಾಗಲೇ ಬಳಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಬೇರೆ ಹೆಸರು ಆಯ್ಕೆಮಾಡಿ\n(This name is already taken. Please choose another name)"
+                    )
+                    return@launch
+                }
+            }
+            
+            // Use hybrid authentication
+            authManager.loginWithPassword(
+                name = name,
+                phoneNumber = phoneNumber,
+                password = password,
+                onSuccess = { user ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        isAuthenticated = true
+                    )
+                },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = "ಲಾಗಿನ್ ವಿಫಲವಾಗಿದೆ: ${exception.message}\n(Login failed)"
+                    )
+                }
+            )
+        }
     }
 }
