@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.rayara.sevasetu.auth.AuthConfig
 import com.rayara.sevasetu.auth.AuthManager
 import com.rayara.sevasetu.data.database.AppDatabase
 import com.rayara.sevasetu.utils.PreferencesManager
@@ -234,47 +235,49 @@ fun SettingsScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Dangerous Zone
-            Text(
-                text = "⚠️ ಅಪಾಯಕಾರಿ ವಲಯ",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ತೆರವುಗೊಳಿಸಿ",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                    Text(
-                        text = "(ಪರೀಕ್ಷಾ ಉದ್ದೇಶಕ್ಕಾಗಿ ಮಾತ್ರ)",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                    
-                    Button(
-                        onClick = { showClearDialog = true },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+            // Dangerous Zone - Only visible for admin
+            if (currentUser != null && AuthConfig.isAdmin(currentUser!!.name, currentUser!!.mobileNumber)) {
+                Text(
+                    text = "⚠️ ಅಪಾಯಕಾರಿ ವಲಯ",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ತೆರವುಗೊಳಿಸಿ",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಿ")
+                        Text(
+                            text = "(ಪರೀಕ್ಷಾ ಉದ್ದೇಶಕ್ಕಾಗಿ ಮಾತ್ರ - ಕೇವಲ ನಿರ್ವಾಹಕರಿಗೆ)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                        
+                        Button(
+                            onClick = { showClearDialog = true },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("ಎಲ್ಲಾ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಿ")
+                        }
                     }
                 }
             }

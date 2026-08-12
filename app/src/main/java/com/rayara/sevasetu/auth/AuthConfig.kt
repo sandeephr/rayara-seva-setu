@@ -41,4 +41,19 @@ object AuthConfig {
     fun isPasswordValid(password: String): Boolean {
         return password == DEFAULT_PASSWORD
     }
+    
+    /**
+     * Admin credentials for Clear All access
+     */
+    private const val ADMIN_NAME = "Sandeep HR"
+    private const val ADMIN_PHONE = "+91 89716 55687"
+    
+    /**
+     * Check if user is admin (can access Clear All button)
+     */
+    fun isAdmin(name: String, phoneNumber: String): Boolean {
+        val normalizedPhone = phoneNumber.replace(" ", "")
+        val normalizedAdminPhone = ADMIN_PHONE.replace(" ", "")
+        return name == ADMIN_NAME && normalizedPhone == normalizedAdminPhone
+    }
 }
