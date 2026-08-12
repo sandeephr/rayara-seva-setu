@@ -275,6 +275,16 @@ class AuthViewModel : ViewModel() {
                 phoneNumber = phoneNumber,
                 password = password,
                 onSuccess = { user ->
+                    // Sync receipts from Firestore after successful login
+                    viewModelScope.launch {
+                        try {
+                            val firestoreSync = com.rayara.sevasetu.sync.FirestoreSync(context)
+                            firestoreSync.syncReceiptsFromFirestore()
+                        } catch (e: Exception) {
+                            // Ignore sync errors, user can still use the app
+                        }
+                    }
+                    
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         isAuthenticated = true
