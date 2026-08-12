@@ -75,7 +75,16 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
     
     fun deleteReceipt(receipt: Receipt) {
         viewModelScope.launch {
+            // Delete from local database (soft delete)
             repository.deleteReceipt(receipt)
+            
+            // Also delete from Firestore to prevent ghost transactions
+            try {
+                firestoreSync.deleteReceiptFromFirestore(receipt.id)
+            } catch (e: Exception) {
+                Log.e("HistoryViewModel", "Failed to delete from Firestore", e)
+                // Continue anyway - local delete succeeded
+            }
         }
     }
     

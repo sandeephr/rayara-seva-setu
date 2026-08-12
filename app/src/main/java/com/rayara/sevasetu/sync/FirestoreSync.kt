@@ -138,6 +138,22 @@ class FirestoreSync(private val context: Context) {
         }
     }
     
+    // Delete individual receipt from Firestore
+    suspend fun deleteReceiptFromFirestore(receiptId: Long): Boolean {
+        return try {
+            firestore.collection(RECEIPTS_COLLECTION)
+                .document(receiptId.toString())
+                .delete()
+                .await()
+            
+            Log.d(TAG, "Receipt $receiptId deleted from Firestore")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete receipt from Firestore", e)
+            false
+        }
+    }
+    
     // Delete all receipts from Firestore
     suspend fun deleteAllReceiptsFromFirestore(): Boolean {
         return try {
