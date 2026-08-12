@@ -127,21 +127,70 @@ class AuthManager(private val context: Context) {
         onSuccess: (User) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        // Validate credentials first
+        val validation = validateCredentials(phoneNumber, password)
+        if (validation != ValidationResult.Valid) {
+            onFailure(Exception(validation.message))
+            return
+        }
+        
+        // Use Firebase test phone authentication with proper flow
+        val options = PhoneAuthOptions.newBuilder(auth)
+            .setPhoneNumber(phoneNumber)
+            .setTimeout(60L, TimeUnit.SECONDS)
+            .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                    // Auto-verification successful - sign in
+                    kotlinx.coroutines.GlobalScope.launch {
+                        try {
+                            val result = auth.signInWithCredential(credential).await()
+                            val firebaseUser = result.user ?: throw Exception("Firebase authentication failed")
+                            
+                            // Process user login/registration
+                            processUserAuthentication(name, phoneNumber, firebaseUser.uid, onSuccess, onFailure)
+                        } catch (e: Exception) {
+                            onFailure(e)
+                        }
+                    }
+                }
+                
+                override fun onVerificationFailed(e: FirebaseException) {
+                    onFailure(e)
+                }
+                
+                override fun onCodeSent(
+                    verificationId: String,
+                    token: PhoneAuthProvider.ForceResendingToken
+                ) {
+                    // For test numbers, auto-verify with the test code
+                    kotlinx.coroutines.GlobalScope.launch {
+                        try {
+                            val credential = PhoneAuthProvider.getCredential(verificationId, AuthConfig.DEFAULT_PASSWORD)
+                            val result = auth.signInWithCredential(credential).await()
+                            val firebaseUser = result.user ?: throw Exception("Firebase authentication failed")
+                            
+                            // Process user login/registration
+                            processUserAuthentication(name, phoneNumber, firebaseUser.uid, onSuccess, onFailure)
+                        } catch (e: Exception) {
+                            onFailure(e)
+                        }
+                    }
+                }
+            })
+            .build()
+        
+        PhoneAuthProvider.verifyPhoneNumber(options)
+    }
+    
+    // Helper function to process user authentication after Firebase auth
+    private suspend fun processUserAuthentication(
+        name: String,
+        phoneNumber: String,
+        firebaseUid: String,
+        onSuccess: (User) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         try {
-            // Validate credentials
-            val validation = validateCredentials(phoneNumber, password)
-            if (validation != ValidationResult.Valid) {
-                throw Exception(validation.message)
-            }
-            
-            // Use Firebase test phone authentication
-            val credential = PhoneAuthProvider.getCredential(
-                phoneNumber,
-                AuthConfig.DEFAULT_PASSWORD
-            )
-            val result = auth.signInWithCredential(credential).await()
-            val firebaseUser = result.user ?: throw Exception("Firebase authentication failed")
-            
             // Check if user exists (login) or new user (register)
             val existingUser = userDao.getUserByMobile(phoneNumber)
             
@@ -172,7 +221,7 @@ class AuthManager(private val context: Context) {
                     name = name,
                     mobileNumber = phoneNumber,
                     isVerified = true,
-                    firebaseUid = firebaseUser.uid,
+                    firebaseUid = firebaseUid,
                     currentDeviceId = deviceId,
                     loginToken = UUID.randomUUID().toString(),
                     createdAt = System.currentTimeMillis(),

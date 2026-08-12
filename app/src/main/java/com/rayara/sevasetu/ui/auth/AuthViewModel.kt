@@ -62,7 +62,10 @@ class AuthViewModel : ViewModel() {
     }
     
     fun updatePassword(password: String) {
-        _uiState.value = _uiState.value.copy(password = password, errorMessage = null)
+        // Only allow 6 digits
+        if (password.length <= 6 && password.all { it.isDigit() }) {
+            _uiState.value = _uiState.value.copy(password = password, errorMessage = null)
+        }
     }
     
     fun updateOTPCode(code: String) {
@@ -239,6 +242,14 @@ class AuthViewModel : ViewModel() {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     errorMessage = "ದಯವಿಟ್ಟು ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ (Please enter password)"
+                )
+                return@launch
+            }
+            
+            if (password.length != 6) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = "ಪಾಸ್‌ವರ್ಡ್ 6 ಅಂಕಿಗಳಾಗಿರಬೇಕು (Password must be 6 digits)"
                 )
                 return@launch
             }

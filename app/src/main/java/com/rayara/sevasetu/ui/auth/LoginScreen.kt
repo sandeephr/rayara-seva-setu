@@ -183,10 +183,10 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = uiState.password,
                         onValueChange = viewModel::updatePassword,
-                        label = { Text("ಪಾಸ್‌ವರ್ಡ್ (Password)") },
+                        label = { Text("ಪಾಸ್‌ವರ್ಡ್ (Password - 6 digits)") },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !uiState.isLoading,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -201,7 +201,7 @@ fun LoginScreen(
                         enabled = !uiState.isLoading && 
                                  uiState.name.isNotBlank() && 
                                  uiState.mobileNumber.length == 10 &&
-                                 uiState.password.isNotBlank(),
+                                 uiState.password.length == 6,
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         if (uiState.isLoading) {
