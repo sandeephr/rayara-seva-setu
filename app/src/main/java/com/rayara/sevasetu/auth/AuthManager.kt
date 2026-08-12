@@ -194,8 +194,36 @@ class AuthManager(private val context: Context) {
         onFailure: (Exception) -> Unit
     ) {
         try {
-            // Check if user exists (login) or new user (register)
-            val existingUser = userDao.getUserByMobile(phoneNumber)
+            // Check if user exists in local database first
+            var existingUser = userDao.getUserByMobile(phoneNumber)
+            
+            // If not in local DB, check Firestore
+            if (existingUser == null) {
+                try {
+                    val snapshot = firestore.collection("users")
+                        .whereEqualTo("mobileNumber", phoneNumber)
+                        .get()
+                        .await()
+                    
+                    if (!snapshot.isEmpty) {
+                        // User exists in Firestore - sync to local DB
+                        val doc = snapshot.documents[0]
+                        existingUser = User(
+                            userId = doc.getString("userId") ?: "",
+                            name = doc.getString("name") ?: "",
+                            mobileNumber = doc.getString("mobileNumber") ?: "",
+                            isVerified = doc.getBoolean("verified") ?: true,
+                            firebaseUid = doc.getString("firebaseUid") ?: firebaseUid,
+                            currentDeviceId = doc.getString("currentDeviceId") ?: "",
+                            loginToken = doc.getString("loginToken") ?: "",
+                            createdAt = doc.getLong("createdAt") ?: 0L,
+                            lastLoginAt = doc.getLong("lastLoginAt") ?: 0L
+                        )
+                    }
+                } catch (e: Exception) {
+                    // Firestore check failed - continue with local check
+                }
+            }
             
             if (existingUser != null) {
                 // Existing user - login
