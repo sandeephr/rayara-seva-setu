@@ -255,7 +255,7 @@ class AuthViewModel : ViewModel() {
             }
             
             // Check if mobile is already registered (for new users, validate username)
-            val isMobileRegistered = authManager.isMobileRegistered(mobile)
+            val isMobileRegistered = authManager.isMobileRegistered(phoneNumber)
             
             if (!isMobileRegistered) {
                 // New user - check username availability
