@@ -10,6 +10,9 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rayara.sevasetu.data.database.AppDatabase
 import com.rayara.sevasetu.data.database.entities.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -141,7 +144,7 @@ class AuthManager(private val context: Context) {
             .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                 override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                     // Auto-verification successful - sign in
-                    kotlinx.coroutines.GlobalScope.launch {
+                    CoroutineScope(Dispatchers.IO).launch {
                         try {
                             val result = auth.signInWithCredential(credential).await()
                             val firebaseUser = result.user ?: throw Exception("Firebase authentication failed")
@@ -163,7 +166,7 @@ class AuthManager(private val context: Context) {
                     token: PhoneAuthProvider.ForceResendingToken
                 ) {
                     // For test numbers, auto-verify with the test code
-                    kotlinx.coroutines.GlobalScope.launch {
+                    CoroutineScope(Dispatchers.IO).launch {
                         try {
                             val credential = PhoneAuthProvider.getCredential(verificationId, AuthConfig.DEFAULT_PASSWORD)
                             val result = auth.signInWithCredential(credential).await()
