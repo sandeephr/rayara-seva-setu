@@ -22,6 +22,14 @@ android {
         }
     }
 
+    signingConfigs {
+        // Use debug signing for now (for testing)
+        // TODO: Create proper release keystore for production
+        getByName("debug") {
+            // Uses default debug keystore
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -29,6 +37,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Sign release builds with debug key for now
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
