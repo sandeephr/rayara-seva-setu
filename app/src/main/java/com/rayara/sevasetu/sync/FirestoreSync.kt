@@ -91,10 +91,17 @@ class FirestoreSync(private val context: Context) {
                         continue
                     }
                     
+                    // Check if receipt is marked as deleted in Firestore
+                    val isDeletedInFirestore = document.getBoolean("isDeleted") ?: false
+                    
                     // Check if receipt already exists locally
                     val existingReceipt = receiptDao.getReceiptById(id)
                     if (existingReceipt != null) {
-                        Log.d(TAG, "Receipt $id already exists locally, skipping")
+                        // Update deletion status if changed in Firestore
+                        if (isDeletedInFirestore && !existingReceipt.isDeleted) {
+                            receiptDao.softDeleteReceipt(id)
+                            Log.d(TAG, "Receipt $id marked as deleted (synced from Firestore)")
+                        }
                         skippedCount++
                         continue
                     }
@@ -120,7 +127,7 @@ class FirestoreSync(private val context: Context) {
                         date = date,
                         time = time,
                         pdfPath = null, // PDF is device-specific
-                        isDeleted = false,
+                        isDeleted = isDeletedInFirestore, // Sync deletion status from Firestore
                         createdByUserId = document.getString("createdByUserId") ?: "",
                         createdByUserName = document.getString("createdByUserName") ?: "",
                         createdByMobile = document.getString("createdByMobile") ?: "",
@@ -169,18 +176,18 @@ class FirestoreSync(private val context: Context) {
         }
     }
     
-    // Delete individual receipt from Firestore
+    // Mark receipt as deleted in Firestore (don't actually delete document)
     suspend fun deleteReceiptFromFirestore(receiptId: Long): Boolean {
         return try {
             firestore.collection(RECEIPTS_COLLECTION)
                 .document(receiptId.toString())
-                .delete()
+                .update("isDeleted", true)
                 .await()
             
-            Log.d(TAG, "Receipt $receiptId deleted from Firestore")
+            Log.d(TAG, "Receipt $receiptId marked as deleted in Firestore")
             true
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to delete receipt from Firestore", e)
+            Log.e(TAG, "Failed to mark receipt as deleted in Firestore", e)
             false
         }
     }

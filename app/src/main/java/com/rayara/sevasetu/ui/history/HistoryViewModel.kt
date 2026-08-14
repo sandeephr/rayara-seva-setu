@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 data class HistoryUiState(
     val receipts: List<Receipt> = emptyList(),
     val searchQuery: String = "",
-    val todayTotal: Double = 0.0,
-    val todayCount: Int = 0,
+    val totalAmount: Double = 0.0,
+    val totalCount: Int = 0,
     val isLoading: Boolean = false
 )
 
@@ -53,14 +53,15 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
             }
         }
         
-        val todayTotal = repository.getTodayTotal()
-        val todayCount = filteredReceipts.size
+        // Calculate total from all displayed receipts, not just today's
+        val totalAmount = filteredReceipts.sumOf { it.amount }
+        val receiptCount = filteredReceipts.size
         
         HistoryUiState(
             receipts = filteredReceipts,
             searchQuery = query,
-            todayTotal = todayTotal,
-            todayCount = todayCount,
+            totalAmount = totalAmount,
+            totalCount = receiptCount,
             isLoading = false
         )
     }.stateIn(

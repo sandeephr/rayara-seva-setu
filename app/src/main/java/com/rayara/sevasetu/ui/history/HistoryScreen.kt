@@ -74,8 +74,8 @@ fun HistoryScreen(
             )
             
             TodaySummaryCard(
-                totalAmount = uiState.todayTotal,
-                receiptCount = uiState.todayCount
+                totalAmount = uiState.totalAmount,
+                receiptCount = uiState.totalCount
             )
             
             if (uiState.isLoading) {
